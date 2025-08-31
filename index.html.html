@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Contact Lens Selector</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; font-size: 12px; line-height: 1.3; margin: 0; background: #f8f8f5; color: #0b3d2e; }
+.container { display: flex; max-width: 1100px; margin: 0 auto; padding: 10px; gap: 12px; flex-wrap: wrap; }
+.wrap { flex: 2; min-width: 300px; }
+.summary { flex: 1; min-width: 240px; max-width: 280px; background: #ffffe0; border: 1px solid #d7d7cf; border-radius: 6px; padding: 10px; font-size: 12px; height: fit-content; position: sticky; top: 10px; align-self: flex-start; }
+h1 { font-size:14px; text-align:center; margin-bottom: 12px; }
+h2 { font-size: 13px; margin: 6px 0 8px; }
+.section { background: #ffffe0; border: 1px solid #d7d7cf; border-radius: 6px; padding: 8px; margin: 8px 0; }
+.options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; }
+label { display: block; }
+input[type="checkbox"] { margin-right: 4px; }
+.summary h2 { margin-top: 0; }
+.summary ul { padding-left: 15px; margin: 0; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+table th, table td { 
+  border: 1px solid #ccc; 
+  padding: 6px 8px; /* a little more padding for readability */
+  text-align: left; 
+  min-width: 70px;  /* makes all columns wider */
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* Make FULL NAME column extra wide */
+table th:nth-child(1),
+table td:nth-child(1) {
+  min-width: 300px;  /* FULL NAME column wider */
+}
+
+/* Make FULL NAME column wider */
+table th:nth-child(1),
+table td:nth-child(1) {
+  min-width: 300px;  /* adjust width as needed */
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+table th { background: #e6e6d6; cursor: pointer; }
+button { background: #0b3d2e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-top: 8px; }
+button:disabled { background: #999; cursor: not-allowed; }
+button:hover:not(:disabled) { background: #095c42; }
+@media (max-width: 600px) { .container { flex-direction: column; } .summary { position: relative; top: 0; margin-top: 10px; } }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="wrap">
+    <h1>Contact Lens Selector</h1>
+
+    <!-- Q2: Modality -->
+    <div class="section">
+      <h2>1. TYPES OF DISPOSABLE</h2>
+      <div class="options">
+        <label><input type="checkbox" name="q2" value="1 DAY"> 1 DAY </label>
+        <label><input type="checkbox" name="q2" value="2 WEEKS"> 2 WEEKS </label>
+        <label><input type="checkbox" name="q2" value="1 MONTH"> 1 MONTH </label>
+        <label><input type="checkbox" name="q2" value="3 MONTHS"> 3 MONTHS </label>
+      </div>
+    </div>
+
+    <!-- Q3: Vision -->
+    <div class="section">
+      <h2>2. TYPE OF CORRECTION</h2>
+      <div class="options">
+        <label><input type="checkbox" name="q3" value="SPH"> NORMAL </label>
+        <label><input type="checkbox" name="q3" value="ASTIG"> ASTIGMATISM / CYLINDER </label>
+        <label><input type="checkbox" name="q3" value="MF"> MULTI-FOCAL </label>
+      </div>
+    </div>
+
+    <!-- Q4: Material -->
+    <div class="section">
+      <h2>3. WEARING HOURS </h2>
+      <div class="options">
+        <label><input type="checkbox" name="q4" value="SIHY">MORE THAN 8 HOURS</label>
+        <label><input type="checkbox" name="q4" value="HY">LESS THAN 8 HOURS</label>
+      </div>
+    </div>
+
+    <!-- Q5: Standard / Premium -->
+    <div class="section">
+      <h2>4. COMFORT LEVEL</h2>
+      <div class="options">
+        <label><input type="checkbox" name="q5" value="STANDARD"> Standard</label>
+        <label><input type="checkbox" name="q5" value="PREMIUM"> Premium</label>
+      </div>
+    </div>
+
+    <button id="showBtn" disabled>Loading...</button>
+    <div class="results" id="results"></div>
+  </div>
+
+  <div class="summary">
+    <h2>Your Selections</h2>
+    <ul id="summaryList"><li>No selections yet</li></ul>
+  </div>
+</div>
+
+<script>
+const csvUrl = 'https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL%20DATABASE.csv';
+let products = [];
+const button = document.getElementById('showBtn');
+
+// Fetch CSV
+fetch(csvUrl)
+  .then(res => res.text())
+  .then(text => {
+    const rows = text.trim().split('\n').map(r => r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+    const headers = rows[0].map(h => h.replace(/^"|"$/g,'').trim());
+   // Parse CSV and normalize headers
+products = rows.slice(1).map(r => {
+  let obj = {};
+  r.forEach((val,i) => {
+    const key = headers[i].replace(/^"|"$/g,'').trim(); // remove quotes + trim
+    obj[key] = val.replace(/^"|"$/g,'').trim();         // remove quotes + trim
+  });
+  return obj;
+});
+
+// Optional: debug first row to see headers exactly
+console.log(products[0]);
+
+    button.disabled = false;
+    button.textContent = 'Show Results';
+  })
+  .catch(err => console.error('CSV Load Error:', err));
+
+// Update summary
+document.querySelectorAll("input[type=checkbox]").forEach(input => {
+  input.addEventListener("change", () => {
+    const list = document.getElementById("summaryList");
+    const checked = document.querySelectorAll("input[type=checkbox]:checked");
+    list.innerHTML = checked.length ? '' : '<li>No selections yet</li>';
+    checked.forEach(c => list.appendChild(Object.assign(document.createElement('li'), {textContent: c.parentElement.textContent.trim()})));
+  });
+});
+
+// Show results
+function showResults() {
+  const selected = {q2:[], q3:[], q4:[], q5:[]};
+  document.querySelectorAll("input[type=checkbox]:checked").forEach(c => selected[c.name].push(c.value.toUpperCase()));
+
+  const filtered = products.filter(p => {
+    const mCol = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
+    const vCol = "VISION (SPH, ASTIG, MF)";
+    const matCol = "MATERIAL (SIHY, HY)";
+    const gCol = "GRADE (PREMIUM, STANDARD)";
+
+    const modality = p[mCol]?.trim().toUpperCase();
+    const vision = p[vCol]?.trim().toUpperCase();
+    const material = p[matCol]?.trim().toUpperCase();
+    const grade = p[gCol]?.trim().toUpperCase();
+
+    if (selected.q2.length && !selected.q2.includes(modality)) return false;
+    if (selected.q3.length && !selected.q3.includes(vision)) return false;
+    if (selected.q4.length && !selected.q4.includes(material)) return false;
+    if (selected.q5.length && !selected.q5.includes(grade)) return false;
+
+    return true;
+  });
+
+  renderTable(filtered);
+}
+
+// Render table
+// Render table
+function renderTable(data) {
+  const container = document.getElementById("results");
+  if (!data.length) { 
+    container.innerHTML = "<p>No matching products found.</p>"; 
+    return; 
+  }
+
+  const headers = ["FULL NAME","PRICE 1 BOX (RM)","PIECES IN 1 BOX","MATERIAL (SIHY, HY)","GRADE (PREMIUM, STANDARD)"];
+const headerMap = {
+  "FULL NAME": "CONTACT LENS",
+  "PRICE 1 BOX (RM)": "PRICE PER BOX (RM)",
+  "PIECES IN 1 BOX": "QTY IN A BOX",
+  "MATERIAL (SIHY, HY)": "MATERIAL",
+  "GRADE (PREMIUM, STANDARD)": "COMFORT LEVEL"
+};
+
+let table = "<table><thead><tr>" + headers.map(h => `<th onclick="sortTable(this)">${headerMap[h]}</th>`).join('') + "</tr></thead><tbody>";
+
+data.forEach(p => {
+  table += "<tr>" + headers.map(h => `<td>${p[h]}</td>`).join('') + "</tr>";
+});
+table += "</tbody></table>";
+container.innerHTML = table;
+
+}
+
+
+// Sort table
+function sortTable(header) {
+  const table = header.closest("table");
+  const index = [...header.parentNode.children].indexOf(header);
+  const rows = [...table.tBodies[0].rows];
+  const asc = !header.asc;
+  rows.sort((a,b) => a.cells[index].innerText.localeCompare(b.cells[index].innerText, undefined, {numeric:true}) * (asc ? 1 : -1));
+  rows.forEach(r => table.tBodies[0].appendChild(r));
+  header.asc = asc;
+}
+
+// Attach button
+button.addEventListener("click", showResults);
+</script>
+
+</body>
+</html>
