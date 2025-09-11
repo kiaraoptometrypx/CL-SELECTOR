@@ -109,11 +109,6 @@ button:hover:not(:disabled) { background: #095c42; }
 @media (max-width: 600px) { .container { flex-direction: column; } .summary { position: relative; top: 0; margin-top: 10px; } 
 }
 
-img {
-  max-width: 90%;
-  height: auto;
-}
-
 
 </style>
 </head>
@@ -317,39 +312,23 @@ function toggleImage(link, photo, name) {
   const row = link.closest("tr");
   const nextRow = row.nextElementSibling;
 
-  // If next row is already the image, slide up and remove
+  // If next row is already the image, remove it
   if (nextRow && nextRow.classList.contains("imageRow")) {
-    nextRow.style.height = '0px';
-    setTimeout(() => nextRow.remove(), 300); // match transition duration
+    nextRow.remove();
     return;
   }
 
   // Otherwise, insert image row
   const imgRow = document.createElement("tr");
   imgRow.classList.add("imageRow");
-  imgRow.style.height = '0px';
-  imgRow.style.overflow = 'hidden';
-  imgRow.style.transition = 'height 0.3s ease';
-
-  const td = document.createElement("td");
-  td.colSpan = row.children.length; // dynamic colspan
-  td.style.textAlign = 'center';
-  td.innerHTML = `
-    <h3>${name}</h3>
-    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photo}.png" 
-         alt="${name}" 
-         style="width:300px; height:auto; border:1px solid #ccc; border-radius:6px; margin-top:10px;">
-  `;
-
-  imgRow.appendChild(td);
+  imgRow.innerHTML = `<td colspan="3" style="text-align:center;">
+                        <h3>${name}</h3>
+                        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photo}.png" 
+                             alt="${name}" 
+                             style="width:300px; height:auto; border:1px solid #ccc; border-radius:6px; margin-top:10px;">
+                      </td>`;
   row.parentNode.insertBefore(imgRow, row.nextSibling);
-
-  // Trigger slide down
-  setTimeout(() => {
-    imgRow.style.height = td.scrollHeight + 'px';
-  }, 10);
 }
-
 
 // Sort table
 function sortTable(header) {
