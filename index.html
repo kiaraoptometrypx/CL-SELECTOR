@@ -5,18 +5,92 @@
 <title>Contact Lens Selector</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; font-size: 12px; line-height: 1.3; margin: 0; background: #f8f8f5; color: #0b3d2e; }
-.container { display: flex; max-width: 1100px; margin: 0 auto; padding: 10px; gap: 12px; flex-wrap: wrap; }
-.wrap { flex: 2; min-width: 300px; }
-.summary { flex: 1; min-width: 240px; max-width: 280px; background: #ffffe0; border: 1px solid #d7d7cf; border-radius: 6px; padding: 10px; font-size: 12px; height: fit-content; position: sticky; top: 10px; align-self: flex-start; }
-h1 { font-size:14px; text-align:center; margin-bottom: 12px; }
-h2 { font-size: 13px; margin: 6px 0 8px; }
-.section { background: #ffffe0; border: 1px solid #d7d7cf; border-radius: 6px; padding: 8px; margin: 8px 0; }
-.options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; }
-label { display: block; }
-input[type="checkbox"] { margin-right: 4px; }
-.summary h2 { margin-top: 0; }
-.summary ul { padding-left: 15px; margin: 0; }
+
+
+/* ========= Base ========= */
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-size: 12px;
+  line-height: 1.3;
+  margin: 0;
+  background: #f8f8f5;
+  color: #0b3d2e;
+}
+
+h1 {
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+h2 {
+  font-size: 13px;
+  margin: 6px 0 8px;
+}
+
+/* ========= Layout ========= */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+.wrap {
+  width: 100%;
+  min-width: 300px;
+}
+
+/* ========= Sections ========= */
+.section {
+  background: #ffffe0;
+  border: 1px solid #d7d7cf;
+  border-radius: 6px;
+  padding: 8px;
+  margin: 8px 0;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+}
+
+label {
+  display: block;
+}
+
+input[type="checkbox"] {
+  margin-right: 4px;
+}
+
+/* ========= Summary Box ========= */
+.summary {
+  background: #ffffe0;
+  border: 1px solid #d7d7cf;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 12px;
+  margin: 12px 0;     /* space above/below */
+  position: relative;
+  top: auto;
+  max-width: 100%;
+}
+
+.summary h2 {
+  margin-top: 0;
+}
+
+.summary ul {  
+  padding-left: 15px;
+  margin: 0;
+}
+
+.desc {
+  font-size: 12px;
+  color: #0b3d2e;
+  margin: 4px 0 6px;
+}
+
 table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
 table th, table td { 
   border: 1px solid #ccc; 
@@ -27,81 +101,102 @@ table th, table td {
   word-wrap: break-word;
 }
 
-/* Make FULL NAME column extra wide */
-table th:nth-child(1),
-table td:nth-child(1) {
-  min-width: 300px;  /* FULL NAME column wider */
-}
-
-/* Make FULL NAME column wider */
-table th:nth-child(1),
-table td:nth-child(1) {
-  min-width: 300px;  /* adjust width as needed */
-  white-space: normal;
-  word-wrap: break-word;
-}
 
 table th { background: #e6e6d6; cursor: pointer; }
 button { background: #0b3d2e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-top: 8px; }
 button:disabled { background: #999; cursor: not-allowed; }
 button:hover:not(:disabled) { background: #095c42; }
-@media (max-width: 600px) { .container { flex-direction: column; } .summary { position: relative; top: 0; margin-top: 10px; } }
+@media (max-width: 600px) { .container { flex-direction: column; } .summary { position: relative; top: 0; margin-top: 10px; } 
+}
+
+
 </style>
 </head>
 <body>
+
+
+
+
+
+
+
+
+
+
+
+
 
 <div class="container">
   <div class="wrap">
     <h1>Contact Lens Selector</h1>
 
+
+
     <!-- Q2: Modality -->
     <div class="section">
-      <h2>1. TYPES OF DISPOSABLE</h2>
+      <h2>1. Disposable Period</h2>
+	<p class="desc">Daily disposable lenses offer the best comfort because every pair is a new pair.<br>Reusables are economical and requires hygienic habits.<br>---</p>
       <div class="options">
-        <label><input type="checkbox" name="q2" value="1 DAY"> 1 DAY </label>
-        <label><input type="checkbox" name="q2" value="2 WEEKS"> 2 WEEKS </label>
-        <label><input type="checkbox" name="q2" value="1 MONTH"> 1 MONTH </label>
-        <label><input type="checkbox" name="q2" value="3 MONTHS"> 3 MONTHS </label>
+        <label><input type="checkbox" name="q2" value="1 DAY">1 Day</label>
+        <label><input type="checkbox" name="q2" value="2 WEEKS">2 Weeks</label>
+        <label><input type="checkbox" name="q2" value="1 MONTH">1 Month</label>
+        <label><input type="checkbox" name="q2" value="3 MONTHS">3 Months</label>
       </div>
     </div>
 
     <!-- Q3: Vision -->
     <div class="section">
-      <h2>2. TYPE OF CORRECTION</h2>
+      <h2>2. Prescription Type</h2>
+	<p class="desc">Short or far sighted prescriptions tend to look shorter. ( eg: -2.25 )<br>Astigmatism prescriptions are longer with 3 numbers. ( eg: -2.25/-1.25 x 90 )<br>Multifocals prescriptions will have an ADD. ( eg: -2.25 ADD +1.50 )<br>---</p>
       <div class="options">
-        <label><input type="checkbox" name="q3" value="SPH"> NORMAL </label>
-        <label><input type="checkbox" name="q3" value="ASTIG"> ASTIGMATISM / CYLINDER </label>
-        <label><input type="checkbox" name="q3" value="MF"> MULTI-FOCAL </label>
+        <label><input type="checkbox" name="q3" value="SPH">Short or Far Sighted only (SPH)</label>
+        <label><input type="checkbox" name="q3" value="ASTIG"> With Astigmatism (ASTIG)</label>
+        <label><input type="checkbox" name="q3" value="MF">Multi-focal and Relaxer (MF)</label>
       </div>
     </div>
 
     <!-- Q4: Material -->
     <div class="section">
-      <h2>3. WEARING HOURS </h2>
+      <h2>3. Wearing Hours Per Day</h2>
+	<p class="desc">Silicone Hydrogels (SiHy) are premium materials, allowing more oxygen to get to the eyes.<br>Hydrogels (Hy) have been around for decades and is the normal standard.<br>Eyes are less red and tired if they have enough oxygen.<br>--- </p>
       <div class="options">
-        <label><input type="checkbox" name="q4" value="SIHY">MORE THAN 8 HOURS</label>
-        <label><input type="checkbox" name="q4" value="HY">LESS THAN 8 HOURS</label>
+        <label><input type="checkbox" name="q4" value="SIHY">Silicone Hydrogel (SiHy) if more than 8 Hours</label>
+        <label><input type="checkbox" name="q4" value="HY">Hydrogel (Hy) if less than 8 hours</label>
       </div>
     </div>
 
     <!-- Q5: Standard / Premium -->
     <div class="section">
-      <h2>4. COMFORT LEVEL</h2>
+      <h2>4. Surface Technology</h2>
+	<p class="desc">Premium designs have enhanced comfort from advanced coating, material and solution buffer.<br>Standard designs remain effective but offers less long-term comfort.<br>--- </p>
       <div class="options">
-        <label><input type="checkbox" name="q5" value="STANDARD"> Standard</label>
-        <label><input type="checkbox" name="q5" value="PREMIUM"> Premium</label>
+        <label><input type="checkbox" name="q5" value="PREMIUM">Premium Design</label>
+	<label><input type="checkbox" name="q5" value="STANDARD">Standard Design</label>
       </div>
     </div>
 
-    <button id="showBtn" disabled>Loading...</button>
-    <div class="results" id="results"></div>
-  </div>
 
-  <div class="summary">
+    <div class="summary">
     <h2>Your Selections</h2>
     <ul id="summaryList"><li>No selections yet</li></ul>
-  </div>
+    </div>
+
+
+
+
+    <button id="showBtn" disabled>Loading...</button>
+<input type="text" id="searchBox" placeholder="Refine search, fuzzy logic.." 
+       style="width:100%;padding:6px;margin:12px 0;font-size:12px;">
+
+
+<div id="imagePreview" style="margin-top:20px;"></div>
+<div class="results" id="results"></div>
+
+
+  
 </div>
+
+
 
 <script>
 const csvUrl = 'https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL%20DATABASE.csv';
@@ -147,6 +242,8 @@ function showResults() {
   const selected = {q2:[], q3:[], q4:[], q5:[]};
   document.querySelectorAll("input[type=checkbox]:checked").forEach(c => selected[c.name].push(c.value.toUpperCase()));
 
+  const query = document.getElementById("searchBox").value.trim().toLowerCase();
+
   const filtered = products.filter(p => {
     const mCol = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
     const vCol = "VISION (SPH, ASTIG, MF)";
@@ -158,10 +255,24 @@ function showResults() {
     const material = p[matCol]?.trim().toUpperCase();
     const grade = p[gCol]?.trim().toUpperCase();
 
+    // Apply checkbox filters
     if (selected.q2.length && !selected.q2.includes(modality)) return false;
     if (selected.q3.length && !selected.q3.includes(vision)) return false;
     if (selected.q4.length && !selected.q4.includes(material)) return false;
     if (selected.q5.length && !selected.q5.includes(grade)) return false;
+
+    // Apply search filter (flexible partial matching)
+if (query) {
+  const rowText = Object.values(p).join(" ").toLowerCase();
+
+  // Split search into words
+  const terms = query.split(/\s+/).filter(Boolean);
+
+  // Check if every word exists somewhere in the row text
+  const allMatch = terms.every(t => rowText.includes(t));
+  if (!allMatch) return false;
+}
+
 
     return true;
   });
@@ -169,7 +280,15 @@ function showResults() {
   renderTable(filtered);
 }
 
-// Render table
+// Run search when pressing Enter
+document.getElementById("searchBox").addEventListener("keypress", function(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();  // prevent accidental form submit
+    showResults();
+  }
+});
+
+
 // Render table
 function renderTable(data) {
   const container = document.getElementById("results");
@@ -178,24 +297,28 @@ function renderTable(data) {
     return; 
   }
 
-  const headers = ["FULL NAME","PRICE 1 BOX (RM)","PIECES IN 1 BOX","MATERIAL (SIHY, HY)","GRADE (PREMIUM, STANDARD)"];
+  const headers = ["FULL NAME","1 BOX PRICE & UNIT","COMFORT & MATERIAL"];
 const headerMap = {
-  "FULL NAME": "CONTACT LENS",
-  "PRICE 1 BOX (RM)": "PRICE PER BOX (RM)",
-  "PIECES IN 1 BOX": "QTY IN A BOX",
-  "MATERIAL (SIHY, HY)": "MATERIAL",
-  "GRADE (PREMIUM, STANDARD)": "COMFORT LEVEL"
+  "FULL NAME": "Product",
+  "1 BOX PRICE & UNIT": "Price Per Pack & Qty",
+  "COMFORT & MATERIAL": "Material & Surface",
 };
 
 let table = "<table><thead><tr>" + headers.map(h => `<th onclick="sortTable(this)">${headerMap[h]}</th>`).join('') + "</tr></thead><tbody>";
 
 data.forEach(p => {
-  table += "<tr>" + headers.map(h => `<td>${p[h]}</td>`).join('') + "</tr>";
+table += "<tr>" + headers.map(h => {
+  if (h === "FULL NAME") {
+    return `<td><a onclick="showImage('${p['PHOTO']}', '${p[h]}')">${p[h]}</a></td>`;
+  }
+  return `<td>${p[h]}</td>`;
+}).join('') + "</tr>";
 });
 table += "</tbody></table>";
 container.innerHTML = table;
 
 }
+
 
 
 // Sort table
@@ -211,7 +334,27 @@ function sortTable(header) {
 
 // Attach button
 button.addEventListener("click", showResults);
+
+function showImage(PHOTO, name) {
+  const imgUrl = `https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${PHOTO}.png`;
+  const container = document.getElementById("imagePreview");
+  container.innerHTML = `
+    <h3>${name}</h3>
+    <img src="${imgUrl}" alt="${name}" style="width:500px; height:auto; margin-top:10px; border:1px solid #ccc; border-radius:6px;">
+  `;
+}
+
+
+
 </script>
+
+
+
+<!-- Spacer at the bottom for scrolling -->
+<div style="height:400px;"></div>
+
+
+
 
 </body>
 </html>
