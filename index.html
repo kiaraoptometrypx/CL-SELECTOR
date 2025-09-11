@@ -109,6 +109,11 @@ button:hover:not(:disabled) { background: #095c42; }
 @media (max-width: 600px) { .container { flex-direction: column; } .summary { position: relative; top: 0; margin-top: 10px; } 
 }
 
+img {
+  max-width: 90%;
+  height: auto;
+}
+
 
 </style>
 </head>
@@ -189,7 +194,6 @@ button:hover:not(:disabled) { background: #095c42; }
        style="width:100%;padding:6px;margin:12px 0;font-size:12px;">
 
 
-<div id="imagePreview" style="margin-top:20px;"></div>
 <div class="results" id="results"></div>
 
 
@@ -209,19 +213,17 @@ fetch(csvUrl)
   .then(text => {
     const rows = text.trim().split('\n').map(r => r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
     const headers = rows[0].map(h => h.replace(/^"|"$/g,'').trim());
-   // Parse CSV and normalize headers
-products = rows.slice(1).map(r => {
-  let obj = {};
-  r.forEach((val,i) => {
-    const key = headers[i].replace(/^"|"$/g,'').trim(); // remove quotes + trim
-    obj[key] = val.replace(/^"|"$/g,'').trim();         // remove quotes + trim
-  });
-  return obj;
-});
 
-// Optional: debug first row to see headers exactly
-console.log(products[0]);
+    products = rows.slice(1).map(r => {
+      let obj = {};
+      r.forEach((val,i) => {
+        const key = headers[i].replace(/^"|"$/g,'').trim();
+        obj[key] = val.replace(/^"|"$/g,'').trim();
+      });
+      return obj;
+    });
 
+    console.log(products[0]); // debug first row
     button.disabled = false;
     button.textContent = 'Show Results';
   })
@@ -255,24 +257,16 @@ function showResults() {
     const material = p[matCol]?.trim().toUpperCase();
     const grade = p[gCol]?.trim().toUpperCase();
 
-    // Apply checkbox filters
     if (selected.q2.length && !selected.q2.includes(modality)) return false;
     if (selected.q3.length && !selected.q3.includes(vision)) return false;
     if (selected.q4.length && !selected.q4.includes(material)) return false;
     if (selected.q5.length && !selected.q5.includes(grade)) return false;
 
-    // Apply search filter (flexible partial matching)
-if (query) {
-  const rowText = Object.values(p).join(" ").toLowerCase();
-
-  // Split search into words
-  const terms = query.split(/\s+/).filter(Boolean);
-
-  // Check if every word exists somewhere in the row text
-  const allMatch = terms.every(t => rowText.includes(t));
-  if (!allMatch) return false;
-}
-
+    if (query) {
+      const rowText = Object.values(p).join(" ").toLowerCase();
+      const terms = query.split(/\s+/).filter(Boolean);
+      if (!terms.every(t => rowText.includes(t))) return false;
+    }
 
     return true;
   });
@@ -283,11 +277,10 @@ if (query) {
 // Run search when pressing Enter
 document.getElementById("searchBox").addEventListener("keypress", function(e) {
   if (e.key === "Enter") {
-    e.preventDefault();  // prevent accidental form submit
+    e.preventDefault();
     showResults();
   }
 });
-
 
 // Render table
 function renderTable(data) {
@@ -298,27 +291,64 @@ function renderTable(data) {
   }
 
   const headers = ["FULL NAME","1 BOX PRICE & UNIT","COMFORT & MATERIAL"];
-const headerMap = {
-  "FULL NAME": "Product",
-  "1 BOX PRICE & UNIT": "Price Per Pack & Qty",
-  "COMFORT & MATERIAL": "Material & Surface",
-};
+  const headerMap = {
+    "FULL NAME": "Product",
+    "1 BOX PRICE & UNIT": "Price Per Pack & Qty",
+    "COMFORT & MATERIAL": "Material & Surface",
+  };
 
-let table = "<table><thead><tr>" + headers.map(h => `<th onclick="sortTable(this)">${headerMap[h]}</th>`).join('') + "</tr></thead><tbody>";
+  let table = "<table><thead><tr>" + headers.map(h => `<th onclick="sortTable(this)">${headerMap[h]}</th>`).join('') + "</tr></thead><tbody>";
 
-data.forEach(p => {
-table += "<tr>" + headers.map(h => {
-  if (h === "FULL NAME") {
-    return `<td><a onclick="showImage('${p['PHOTO']}', '${p[h]}')">${p[h]}</a></td>`;
-  }
-  return `<td>${p[h]}</td>`;
-}).join('') + "</tr>";
-});
-table += "</tbody></table>";
-container.innerHTML = table;
+  data.forEach(p => {
+    table += "<tr>" + headers.map(h => {
+      if (h === "FULL NAME") {
+        return `<td><a href="#" onclick="toggleImage(this,'${p['PHOTO']}','${p[h]}'); return false;">${p[h]}</a></td>`;
+      }
+      return `<td>${p[h]}</td>`;
+    }).join('') + "</tr>";
+  });
 
+  table += "</tbody></table>";
+  container.innerHTML = table;
 }
 
+// Toggle image under row
+function toggleImage(link, photo, name) {
+  const row = link.closest("tr");
+  const nextRow = row.nextElementSibling;
+
+  // If next row is already the image, slide up and remove
+  if (nextRow && nextRow.classList.contains("imageRow")) {
+    nextRow.style.height = '0px';
+    setTimeout(() => nextRow.remove(), 300); // match transition duration
+    return;
+  }
+
+  // Otherwise, insert image row
+  const imgRow = document.createElement("tr");
+  imgRow.classList.add("imageRow");
+  imgRow.style.height = '0px';
+  imgRow.style.overflow = 'hidden';
+  imgRow.style.transition = 'height 0.3s ease';
+
+  const td = document.createElement("td");
+  td.colSpan = row.children.length; // dynamic colspan
+  td.style.textAlign = 'center';
+  td.innerHTML = `
+    <h3>${name}</h3>
+    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photo}.png" 
+         alt="${name}" 
+         style="width:300px; height:auto; border:1px solid #ccc; border-radius:6px; margin-top:10px;">
+  `;
+
+  imgRow.appendChild(td);
+  row.parentNode.insertBefore(imgRow, row.nextSibling);
+
+  // Trigger slide down
+  setTimeout(() => {
+    imgRow.style.height = td.scrollHeight + 'px';
+  }, 10);
+}
 
 
 // Sort table
@@ -334,18 +364,6 @@ function sortTable(header) {
 
 // Attach button
 button.addEventListener("click", showResults);
-
-function showImage(PHOTO, name) {
-  const imgUrl = `https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${PHOTO}.png`;
-  const container = document.getElementById("imagePreview");
-  container.innerHTML = `
-    <h3>${name}</h3>
-    <img src="${imgUrl}" alt="${name}" style="width:300px; height:auto; margin-top:10px; border:1px solid #ccc; border-radius:6px;">
-  `;
-}
-
-
-
 </script>
 
 
