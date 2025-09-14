@@ -295,17 +295,6 @@ function showResults() {
     return true;
   });
 
-// Deduplicate by product name safely
-const seen = new Set();
-filtered = filtered.filter(p => {
-  // Adjust the key to exactly match your CSV header, trimmed
-  const name = p["FULL NAME"]?.trim();
-  if (!name) return false;         // skip if name missing
-  if (seen.has(name)) return false;
-  seen.add(name);
-  return true;
-});
-
 
   renderTable(filtered);
 }
