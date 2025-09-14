@@ -152,10 +152,20 @@ button:hover:not(:disabled) { background: #095c42; }
       </div>
     </div>
 
-
-    <!-- Q2: Modality -->
+ <!-- Q2: Vision -->
     <div class="section">
-      <h2>2. What type of disposable?</h2>
+      <h2>2. What type of prescription (RX)?</h2>
+	<p class="desc">Short/far sighted has 1 set number, eg: -2.25.<br>Astigmatism has 3 set numbers, eg: -2.25/-1.25 x 90.<br>Multifocal has ADD, eg: -2.25 ADD +1.50.</p>
+      <div class="options">
+        <label><input type="checkbox" name="q3" value="SPH">Short or Far Sighted (SPH)</label>
+        <label><input type="checkbox" name="q3" value="ASTIG"> With Astigmatism (ASTIG)</label>
+        <label><input type="checkbox" name="q3" value="MF">Multi-focal (MF)</label>
+      </div>
+    </div>
+
+    <!-- Q3: Modality -->
+    <div class="section">
+      <h2>3. What type of disposable?</h2>
       <div class="options">
         <label><input type="checkbox" name="q2" value="1 DAY">1 Day</label>
         <label><input type="checkbox" name="q2" value="2 WEEKS">2 Weeks</label>
@@ -164,20 +174,9 @@ button:hover:not(:disabled) { background: #095c42; }
       </div>
     </div>
 
-    <!-- Q3: Vision -->
-    <div class="section">
-      <h2>3. What type of prescription (RX)?</h2>
-	<p class="desc">Short/far sighted is 1 set number. ( eg: -2.25 ) Astigmatism has 3 set numbers. ( eg: -2.25/-1.25 x 90 ) Multifocal has ADD. ( eg: -2.25 ADD +1.50 )</p>
-      <div class="options">
-        <label><input type="checkbox" name="q3" value="SPH">Short or Far Sighted (SPH)</label>
-        <label><input type="checkbox" name="q3" value="ASTIG"> With Astigmatism (ASTIG)</label>
-        <label><input type="checkbox" name="q3" value="MF">Multi-focal (MF)</label>
-      </div>
-    </div>
-
     <!-- Q4: Material -->
     <div class="section">
-      <h2>4. How many hours of wear? Reduce red and tired eyes with Silicone Hydrogel.</h2>
+      <h2>4. Long or short hours of wear? </h2>
       <div class="options">
         <label><input type="checkbox" name="q4" value="SIHY">Silicone Hydrogel for more than 8 Hours</label>
         <label><input type="checkbox" name="q4" value="HY">Hydrogel for less than 8 hours</label>
@@ -186,10 +185,10 @@ button:hover:not(:disabled) { background: #095c42; }
 
     <!-- Q5: Standard / Premium -->
     <div class="section">
-      <h2>5. Premium designs have extra tech for sensitive eyes</h2>
+      <h2>5. Do you need lenses with advanced technology?</h2>
       <div class="options">
-        <label><input type="checkbox" name="q5" value="PREMIUM">Premium Design</label>
-	<label><input type="checkbox" name="q5" value="STANDARD">Standard Design</label>
+        <label><input type="checkbox" name="q5" value="PREMIUM">Advanced Comfort & Performance</label>
+	<label><input type="checkbox" name="q5" value="STANDARD">Standard Comfort Design</label>
       </div>
     </div>
 
@@ -201,13 +200,15 @@ button:hover:not(:disabled) { background: #095c42; }
 
 
 
+  <button id="showBtn" disabled>Loading...</button>
+  <span id="btnText" style="margin-left:10px">Search Astigmatism Prescription Availability by typing S, C and X. Example: S-5.00 C-1.25 x180</span>
+</div>
 
-    <button id="showBtn" disabled>Loading...</button>
 <input type="text" id="searchBox" placeholder="Refine search, fuzzy logic.." 
        style="width:100%;padding:6px;margin:12px 0;font-size:12px;">
 
-
 <div class="results" id="results"></div>
+
 
 
   
@@ -294,6 +295,18 @@ function showResults() {
     return true;
   });
 
+// Deduplicate by product name safely
+const seen = new Set();
+filtered = filtered.filter(p => {
+  // Adjust the key to exactly match your CSV header, trimmed
+  const name = p["FULL NAME"]?.trim();
+  if (!name) return false;         // skip if name missing
+  if (seen.has(name)) return false;
+  seen.add(name);
+  return true;
+});
+
+
   renderTable(filtered);
 }
 
@@ -313,9 +326,10 @@ function renderTable(data) {
     return; 
   }
 
-  const headers = ["FULL NAME","1 BOX PRICE & UNIT","COMFORT & MATERIAL"];
+  const headers = ["FULL NAME","MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)","1 BOX PRICE & UNIT","COMFORT & MATERIAL"];
   const headerMap = {
     "FULL NAME": "Product (Click on product to see image)",
+    "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)": "Dispose Period",
     "1 BOX PRICE & UNIT": "Price Per Pack & Qty",
     "COMFORT & MATERIAL": "Material & Surface",
   };
@@ -349,11 +363,11 @@ function toggleImage(link, photo, name) {
   // Otherwise, insert image row
   const imgRow = document.createElement("tr");
   imgRow.classList.add("imageRow");
-  imgRow.innerHTML = `<td colspan="3" style="text-align:center;">
+  imgRow.innerHTML = `<td colspan="4" style="text-align:center;">
                         <h3>${name}</h3>
                         <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photo}.png" 
                              alt="${name}" 
-                             style="width:300px; height:auto; border:1px solid #ccc; border-radius:6px; margin-top:10px;">
+                             style="width:400px; height:auto; border:1px solid #ccc; border-radius:6px; margin-top:10px;">
                       </td>`;
   row.parentNode.insertBefore(imgRow, row.nextSibling);
 }
