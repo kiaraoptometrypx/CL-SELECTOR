@@ -145,8 +145,7 @@ button:hover:not(:disabled) { background: #095c42; }
     <!-- Q1: Clear or Colour -->
     <div class="section">
       <h2>1. Clear or coloured lenses?</h2>
-	<p class="desc">---</p>
-      <div class="options">
+	<div class="options">
         <label><input type="checkbox" name="q1" value="CLEAR">Clear</label>
         <label><input type="checkbox" name="q1" value="COLOUR">Colour</label>
 
@@ -157,7 +156,6 @@ button:hover:not(:disabled) { background: #095c42; }
     <!-- Q2: Modality -->
     <div class="section">
       <h2>2. What type of disposable?</h2>
-	<p class="desc">When do you plan to replace them?<br>---</p>
       <div class="options">
         <label><input type="checkbox" name="q2" value="1 DAY">1 Day</label>
         <label><input type="checkbox" name="q2" value="2 WEEKS">2 Weeks</label>
@@ -169,7 +167,7 @@ button:hover:not(:disabled) { background: #095c42; }
     <!-- Q3: Vision -->
     <div class="section">
       <h2>3. What type of prescription (RX)?</h2>
-	<p class="desc">Short or far sighted RX are short. ( eg: -2.25 )<br>Astigmatism RX has 3 numbers. ( eg: -2.25/-1.25 x 90 )<br>Multifocals RX has ADD. ( eg: -2.25 ADD +1.50 )<br>---</p>
+	<p class="desc">Short/far sighted is 1 set number. ( eg: -2.25 ) Astigmatism has 3 set numbers. ( eg: -2.25/-1.25 x 90 ) Multifocal has ADD. ( eg: -2.25 ADD +1.50 )</p>
       <div class="options">
         <label><input type="checkbox" name="q3" value="SPH">Short or Far Sighted (SPH)</label>
         <label><input type="checkbox" name="q3" value="ASTIG"> With Astigmatism (ASTIG)</label>
@@ -179,8 +177,7 @@ button:hover:not(:disabled) { background: #095c42; }
 
     <!-- Q4: Material -->
     <div class="section">
-      <h2>4. How many hours of wear?</h2>
-	<p class="desc">Premium materials reduce red and tired eyes.<br>--- </p>
+      <h2>4. How many hours of wear? Reduce red and tired eyes with Silicone Hydrogel.</h2>
       <div class="options">
         <label><input type="checkbox" name="q4" value="SIHY">Silicone Hydrogel for more than 8 Hours</label>
         <label><input type="checkbox" name="q4" value="HY">Hydrogel for less than 8 hours</label>
@@ -189,8 +186,7 @@ button:hover:not(:disabled) { background: #095c42; }
 
     <!-- Q5: Standard / Premium -->
     <div class="section">
-      <h2>5. Do you want something for sensitive eyes?</h2>
-	<p class="desc">Premium designs have enhanced comfort from advanced coating and material.<br>--- </p>
+      <h2>5. Premium designs have extra tech for sensitive eyes</h2>
       <div class="options">
         <label><input type="checkbox" name="q5" value="PREMIUM">Premium Design</label>
 	<label><input type="checkbox" name="q5" value="STANDARD">Standard Design</label>
@@ -317,9 +313,10 @@ function renderTable(data) {
     return; 
   }
 
-  const headers = ["FULL NAME","1 BOX PRICE & UNIT","COMFORT & MATERIAL"];
+  const headers = ["FULL NAME","RX RANGE","1 BOX PRICE & UNIT","COMFORT & MATERIAL"];
   const headerMap = {
     "FULL NAME": "Product (Click on product to see image)",
+    "RX RANGE": "Rx Range",
     "1 BOX PRICE & UNIT": "Price Per Pack & Qty",
     "COMFORT & MATERIAL": "Material & Surface",
   };
