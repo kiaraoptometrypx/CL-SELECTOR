@@ -198,8 +198,13 @@ button:hover:not(:disabled) { background: #095c42; }
   <span id="btnText" style="margin-left:10px">Search Astigmatism Prescription Availability by typing S, C and X. Example: S-5.00 C-1.25 x180</span>
 </div>
 
-<input type="text" id="searchBox" placeholder="Refine search, fuzzy logic.." 
-       style="width:100%;padding:6px;margin:12px 0;font-size:12px;">
+<div style="display:flex; gap:4%; margin:12px 0;">
+  <input type="text" id="searchRE" placeholder="Search Bar Right"
+         style="flex:1; padding:6px; font-size:12px;">
+  <input type="text" id="searchLE" placeholder="Search Bar Left (Use if needed)"
+         style="flex:1; padding:6px; font-size:12px;">
+</div>
+
 
 <div class="results" id="results"></div>
 
@@ -247,7 +252,7 @@ document.querySelectorAll("input[type=checkbox]").forEach(input => {
   });
 });
 
-// Show results (updated to include Q1)
+// Show results
 function showResults() {
   // Collect all selected checkboxes
   const selected = {q1:[], q2:[], q3:[], q4:[], q5:[]};
@@ -255,46 +260,68 @@ function showResults() {
     selected[c.name].push(c.value.toUpperCase());
   });
 
-  // Get the search query
-  const query = document.getElementById("searchBox").value.trim().toLowerCase();
+  // Get the search queries
+  const reInput = document.getElementById("searchRE").value.trim().toLowerCase();
+  let leInput = document.getElementById("searchLE").value.trim().toLowerCase();
 
-  // Filter products
-  const filtered = products.filter(p => {
-    const q1Col = "LENS TYPE (CLEAR, COLOUR)";   
-    const mCol = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
-    const vCol = "VISION (SPH, ASTIG, MF)";
-    const matCol = "MATERIAL (SIHY, HY)";
-    const gCol = "GRADE (PREMIUM, STANDARD)";
+  // If LE is empty, copy RE
+  if (!leInput) leInput = reInput;
 
-    const lensType = p[q1Col]?.trim().toUpperCase();
-    const modality = p[mCol]?.trim().toUpperCase();
-    const vision = p[vCol]?.trim().toUpperCase();
-    const material = p[matCol]?.trim().toUpperCase();
-    const grade = p[gCol]?.trim().toUpperCase();
+  // Filter products by checkboxes and fuzzy search
+  function filterProducts(query) {
+    return products.filter(p => {
+      const q1Col = "LENS TYPE (CLEAR, COLOUR)";   
+      const mCol = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
+      const vCol = "VISION (SPH, ASTIG, MF)";
+      const matCol = "MATERIAL (SIHY, HY)";
+      const gCol = "GRADE (PREMIUM, STANDARD)";
 
-    // Filter by selections
-    if (selected.q1.length && !selected.q1.includes(lensType)) return false;
-    if (selected.q2.length && !selected.q2.includes(modality)) return false;
-    if (selected.q3.length && !selected.q3.includes(vision)) return false;
-    if (selected.q4.length && !selected.q4.includes(material)) return false;
-    if (selected.q5.length && !selected.q5.includes(grade)) return false;
+      const lensType = p[q1Col]?.trim().toUpperCase();
+      const modality = p[mCol]?.trim().toUpperCase();
+      const vision = p[vCol]?.trim().toUpperCase();
+      const material = p[matCol]?.trim().toUpperCase();
+      const grade = p[gCol]?.trim().toUpperCase();
 
-    // Fuzzy search
-    if (query) {
-      const rowText = Object.values(p).join(" ").toLowerCase();
-      const terms = query.split(/\s+/).filter(Boolean);
-      if (!terms.every(t => rowText.includes(t))) return false;
-    }
+      // Filter by selections
+      if (selected.q1.length && !selected.q1.includes(lensType)) return false;
+      if (selected.q2.length && !selected.q2.includes(modality)) return false;
+      if (selected.q3.length && !selected.q3.includes(vision)) return false;
+      if (selected.q4.length && !selected.q4.includes(material)) return false;
+      if (selected.q5.length && !selected.q5.includes(grade)) return false;
 
-    return true;
-  });
+      // Fuzzy search
+      if (query) {
+        const rowText = Object.values(p).join(" ").toLowerCase();
+        const terms = query.split(/\s+/).filter(Boolean);
+        if (!terms.every(t => rowText.includes(t))) return false;
+      }
 
+      return true;
+    });
+  }
 
-  renderTable(filtered);
+  // Filter each eye
+  const reFiltered = filterProducts(reInput);
+  const leFiltered = filterProducts(leInput);
+
+  // Keep only products that exist in BOTH results (overlap)
+  const overlapping = reFiltered.filter(p1 =>
+      leFiltered.some(p2 => p2["FULL NAME"] === p1["FULL NAME"])
+  );
+
+  renderTable(overlapping);
 }
 
+
 // Run search when pressing Enter
-document.getElementById("searchBox").addEventListener("keypress", function(e) {
+document.getElementById("searchRE").addEventListener("keypress", function(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    showResults();
+  }
+});
+
+document.getElementById("searchLE").addEventListener("keypress", function(e) {
   if (e.key === "Enter") {
     e.preventDefault();
     showResults();
