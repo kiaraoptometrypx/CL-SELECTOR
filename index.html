@@ -121,6 +121,20 @@ button:hover:not(:disabled) { background: #095c42; }
   text-decoration: underline;
 }
 
+/* 🔒 Overlay for blackout */
+#overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #EDEADF;
+  color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  z-index: 9999;
+}
+
 
 </style>
 </head>
@@ -128,7 +142,35 @@ button:hover:not(:disabled) { background: #095c42; }
 
 
 
+<!-- 🔒 Locked screen -->
+<div id="overlay">🔒 Entering password...</div>
 
+
+<script>
+  function checkPassword() {
+    let password = "";
+    const correctPassword = "kiara"; // change this
+
+    while (password !== correctPassword) {
+      password = prompt("Please enter password to use:");
+      if (password === null) {
+        document.getElementById("overlay").innerHTML = "Sorry, Access Denied.";
+        return false;
+      }
+      if (password !== correctPassword) {
+        alert("Wrong password. Try again.");
+      }
+    }
+    return true;
+  }
+
+  window.onload = function () {
+    if (checkPassword()) {
+      document.getElementById("overlay").style.display = "none";
+      document.getElementById("content").style.display = "block";
+    }
+  };
+</script>
 
 
 
