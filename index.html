@@ -155,7 +155,7 @@ button:hover:not(:disabled) { background: #095c42; }
  <!-- Q2: Vision -->
     <div class="section">
       <h2>2. What type of prescription (RX)?</h2>
-	<p class="desc">Short/far sighted has 1 set number, eg: -2.25.<br>Astigmatism has 3 set numbers, eg: -2.25/-1.25 x 90.<br>Multifocal has ADD, eg: -2.25 ADD +1.50.</p>
+	<p class="desc">Short/far sighted has 1 set number, eg: -2.25.    Astigmatism has 3 set numbers, eg: -2.25/-1.25 x 90.<br>Multifocal has ADD, eg: -2.25 ADD +1.50.</p>
       <div class="options">
         <label><input type="checkbox" name="q3" value="SPH">Short or Far Sighted (SPH)</label>
         <label><input type="checkbox" name="q3" value="ASTIG"> With Astigmatism (ASTIG)</label>
@@ -176,10 +176,10 @@ button:hover:not(:disabled) { background: #095c42; }
 
     <!-- Q4: Material -->
     <div class="section">
-      <h2>4. Long or short hours of wear? </h2>
+      <h2>4. Wearing long hours? Have red eyes? Feel tired?</h2>
       <div class="options">
-        <label><input type="checkbox" name="q4" value="SIHY">Silicone Hydrogel for more than 8 Hours</label>
-        <label><input type="checkbox" name="q4" value="HY">Hydrogel for less than 8 hours</label>
+        <label><input type="checkbox" name="q4" value="SIHY">High Oxygen Material (SiHy) - For long wearing hours, ie more than 8 hours</label>
+        <label><input type="checkbox" name="q4" value="HY">Standard Oxygen Material (Hy) - For short wearing hours, ie less than 8 hours</label>
       </div>
     </div>
 
@@ -190,12 +190,6 @@ button:hover:not(:disabled) { background: #095c42; }
         <label><input type="checkbox" name="q5" value="PREMIUM">Advanced Comfort & Performance</label>
 	<label><input type="checkbox" name="q5" value="STANDARD">Standard Comfort Design</label>
       </div>
-    </div>
-
-
-    <div class="summary">
-    <h2>Your Selections</h2>
-    <ul id="summaryList"><li>No selections yet</li></ul>
     </div>
 
 
@@ -315,12 +309,20 @@ function renderTable(data) {
     return; 
   }
 
+  // Keep only first occurrence of each FULL NAME
+  const seen = new Set();
+  data = data.filter(p => {
+    if (seen.has(p["FULL NAME"])) return false;
+    seen.add(p["FULL NAME"]);
+    return true;
+  });
+
   const headers = ["FULL NAME","MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)","1 BOX PRICE & UNIT","COMFORT & MATERIAL"];
   const headerMap = {
     "FULL NAME": "Product (Click on product to see image)",
     "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)": "Dispose Period",
     "1 BOX PRICE & UNIT": "Price Per Pack & Qty",
-    "COMFORT & MATERIAL": "Material & Surface",
+    "COMFORT & MATERIAL": "Comfort & Material",
   };
 
   let table = "<table><thead><tr>" + headers.map(h => `<th onclick="sortTable(this)">${headerMap[h]}</th>`).join('') + "</tr></thead><tbody>";
