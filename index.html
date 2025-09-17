@@ -420,16 +420,17 @@ function toggleImage(link, photo, name) {
     return;
   }
 
-  // Otherwise, insert image row
-  const imgRow = document.createElement("tr");
-  imgRow.classList.add("imageRow");
-  imgRow.innerHTML = `<td colspan="4" style="text-align:center;">
-                        <h3>${name}</h3>
-                        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photo}.png" 
-                             alt="${name}" 
-                             style="width:400px; height:auto; border:1px solid #ccc; border-radius:6px; margin-top:10px;">
-                      </td>`;
-  row.parentNode.insertBefore(imgRow, row.nextSibling);
+// Otherwise, insert image row
+const imgRow = document.createElement("tr");
+imgRow.classList.add("imageRow");
+imgRow.innerHTML = `<td colspan="4" style="text-align:center;">
+                      <h3>${name}</h3>
+                      <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photo}.png" 
+                           alt="${name}" 
+                           style="width:100%; max-width:400px; height:auto; border:1px solid #ccc; border-radius:6px; margin-top:10px;">
+                    </td>`;
+row.parentNode.insertBefore(imgRow, row.nextSibling);
+
 }
 
 // Sort table
