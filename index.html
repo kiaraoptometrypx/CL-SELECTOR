@@ -470,19 +470,7 @@ function getNumericPrice(p){
   return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
 }
 
-// Toggle link inside a card: Hide/Show the left image panel
-function toggleCardPhoto(link){
-  // find the nearest card, then its first child (image wrapper)
-  const card = link.closest(".lens-card");
-  if (!card) return false;
-  const imgWrap = card.querySelector("div > div"); // first inner div (image column)
-  if (!imgWrap) return false;
 
-  const currentlyHidden = imgWrap.style.display === "none";
-  imgWrap.style.display = currentlyHidden ? "" : "none";
-  link.textContent = currentlyHidden ? "Hide photo" : "Show photo";
-  return false; // prevent navigation
-}
 
 function setupSorting(table){
   const thead = table.tHead;
