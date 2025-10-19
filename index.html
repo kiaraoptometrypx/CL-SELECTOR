@@ -29,6 +29,20 @@
     padding: 8px;
     margin: 8px 0;
   }
+
+.lens-card{
+  padding:12px;
+  border:1px solid #d7d7cf;
+  border-radius:12px;
+  background:#ffffe0;
+  box-shadow:0 1px 0 rgba(0,0,0,.04);
+  transition: box-shadow .15s ease, transform .15s ease;
+}
+.lens-card:hover{
+  box-shadow:0 4px 10px rgba(0,0,0,.06);
+  transform: translateY(-1px);
+}
+
   .options {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -348,7 +362,6 @@ showBtn.addEventListener("click", showResults);
 /* =========================
    Table rendering + sorting
 ========================= */
-// === Replace your old renderTable with this card-based version ===
 function renderTable(data){
   const container = document.getElementById("results");
   if (!data || !data.length) {
@@ -365,10 +378,9 @@ function renderTable(data){
     return true;
   });
 
-  // Keep a copy so the sort dropdown can re-render
   window._lastResults = clean;
 
-  // Build a simple sort bar + cards grid shell
+  // Sort bar only (no toggle hint)
   container.innerHTML = `
     <div class="pane" style="margin:8px 0; padding:8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
       <b>Sort:</b>
@@ -378,15 +390,12 @@ function renderTable(data){
         <option value="price-asc">Price Low→High</option>
         <option value="price-desc">Price High→Low</option>
       </select>
-      <span style="opacity:.75;">Click a card’s “Hide photo / Show photo” to toggle image.</span>
     </div>
     <div id="cardsGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:10px;"></div>
   `;
 
-  // First render without sorting (defaults to current order)
   buildCards(clean);
 
-  // Hook sorter
   document.getElementById("sortSelect").addEventListener("change", e => {
     const val = e.target.value;
     const items = [...(window._lastResults || [])];
@@ -394,13 +403,14 @@ function renderTable(data){
       const dir = val.endsWith("asc") ? 1 : -1;
       items.sort((a,b) => (a["FULL NAME"]||"").localeCompare(b["FULL NAME"]||"", undefined, {sensitivity:"base"}) * dir);
     } else {
-      // price parse from "1 BOX PRICE & UNIT"
       const dir = val.endsWith("asc") ? 1 : -1;
       items.sort((a,b) => (getNumericPrice(a) - getNumericPrice(b)) * dir);
+      if (dir < 0) items.reverse();
     }
     buildCards(items);
   });
 }
+
 
 // === Helper to render card grid (called by renderTable) ===
 function buildCards(list){
@@ -418,15 +428,22 @@ function buildCards(list){
       : "";
 
     return `
-      <div class="pane lens-card" style="padding:10px; margin:0;">
+      <div class="pane lens-card" style="
+        padding:12px;
+        margin:0;
+        border:1px solid #d7d7cf;
+        border-radius:12px;
+        background:#ffffe0;
+        box-shadow:0 1px 0 rgba(0,0,0,.04);
+      ">
         <div style="display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;">
-          <div style="flex:0 0 160px; max-width:100%;">
+          <div style="flex:0 0 320px; max-width:100%;">
             ${
               hasPhoto
               ? `<img src="${photoURL}" alt="${name}"
-                     style="width:160px; max-width:100%; height:auto; border:1px solid #ccc; border-radius:6px;"
+                     style="width:320px; max-width:100%; height:auto; border:1px solid #ccc; border-radius:6px;"
                      onerror="this.style.display='none'">`
-              : `<div style="width:160px; height:120px; display:flex; align-items:center; justify-content:center; color:#666; border:1px dashed #ccc; border-radius:6px;">No photo</div>`
+              : `<div style="width:320px; height:120px; display:flex; align-items:center; justify-content:center; color:#666; border:1px dashed #ccc; border-radius:6px;">No photo</div>`
             }
           </div>
 
@@ -435,10 +452,6 @@ function buildCards(list){
             <div style="margin:2px 0;"><b>Dispose Period:</b> ${p[H_DISPOSE] || ""}</div>
             <div style="margin:2px 0;"><b>Price Per Pack & Qty:</b> ${p[H_PRICE] || ""}</div>
             <div style="margin:2px 0;"><b>Comfort & Material:</b> ${p[H_MAT] || ""}</div>
-
-            <div style="margin-top:8px;">
-              <a href="#" onclick="return toggleCardPhoto(this)" style="color:#0b3d2e; text-decoration:none;">Hide photo</a>
-            </div>
           </div>
         </div>
       </div>
@@ -447,6 +460,7 @@ function buildCards(list){
 
   grid.innerHTML = html;
 }
+
 
 // === Small helpers ===
 function getNumericPrice(p){
