@@ -230,30 +230,45 @@
 })();
 </script>
 
+
+
+
+
+
+
+
+
+
 <script>
 /* =========================
-   Data + UI wiring
+   Contact Lens Selector – Cards + VALUE_PER_PAIR
+   (Drop-in JS replacement, no <script> wrappers)
 ========================= */
+
 const csvUrl = 'https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL%20DATABASE.csv';
+
 let products = [];
 let csvLoaded = false;
 
 const showBtn = document.getElementById('showBtn');
 const btnText = document.getElementById('btnText');
 
+// ---------- CSV parsing (robust to quoted commas) ----------
 function parseCSV(text){
-  // Robust CSV splitter that respects quoted commas
   const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter(l => l.trim() !== '');
   if (lines.length < 2) return { headers: [], rows: [] };
-  const splitRow = row => row.match(/(?:,|\n|^)(?:"([^"]*(?:""[^"]*)*)"|([^",\n]*))/g)
-    ?.map(s => s.replace(/^,/, ''))
-    ?.map(s => s.replace(/^"|"$/g,'').replace(/""/g,'"')) || [];
+
+  const splitRow = row =>
+    row.match(/(?:,|\n|^)(?:"([^"]*(?:""[^"]*)*)"|([^",\n]*))/g)
+      ?.map(s => s.replace(/^,/, ''))
+      ?.map(s => s.replace(/^"|"$/g,'').replace(/""/g,'"')) || [];
+
   const headers = splitRow(lines[0]).map(h => h.trim());
   const rows = lines.slice(1).map(line => splitRow(line));
   return { headers, rows };
 }
 
-// Load CSV
+// ---------- Load CSV ----------
 fetch(csvUrl, { cache: 'no-store' })
   .then(res => { if (!res.ok) throw new Error("HTTP "+res.status); return res.text(); })
   .then(text => {
@@ -264,18 +279,22 @@ fetch(csvUrl, { cache: 'no-store' })
       return obj;
     });
     csvLoaded = true;
-    showBtn.disabled = false;
-    showBtn.textContent = 'Show Results';
-    btnText.textContent = '';
+    if (showBtn) {
+      showBtn.disabled = false;
+      showBtn.textContent = 'Show Results';
+    }
+    if (btnText) btnText.textContent = '';
   })
   .catch(err => {
     console.error("CSV Load Error:", err);
-    showBtn.disabled = true;
-    showBtn.textContent = 'Load failed';
-    btnText.textContent = 'Please refresh to retry.';
+    if (showBtn) {
+      showBtn.disabled = true;
+      showBtn.textContent = 'Load failed';
+    }
+    if (btnText) btnText.textContent = 'Please refresh to retry.';
   });
 
-// Build selected filters
+// ---------- Collect selected filters ----------
 function getSelections(){
   const selected = { q1:[], q2:[], q3:[], q4:[], q5:[], q6:[] };
   document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
@@ -284,7 +303,7 @@ function getSelections(){
   return selected;
 }
 
-// Core filter (per eye query)
+// ---------- Core filter per eye ----------
 function filterProducts(selected, query){
   const q1Col = "LENS TYPE (CLEAR, COLOUR)";
   const mCol  = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
@@ -319,7 +338,7 @@ function filterProducts(selected, query){
       }
     }
 
-    // Fuzzy search across row
+    // Fuzzy search
     if (terms.length) {
       const rowText = Object.values(p).join(" ").toLowerCase();
       if (!terms.every(t => rowText.includes(t))) return false;
@@ -329,41 +348,59 @@ function filterProducts(selected, query){
   });
 }
 
-// Show Results
+// ---------- Show Results (dual-eye overlap) ----------
 function showResults(){
   if (!csvLoaded) return;
 
   const selected = getSelections();
 
-  const reInput = (document.getElementById("searchRE").value || "").trim().toLowerCase();
-  let   leInput = (document.getElementById("searchLE").value || "").trim().toLowerCase();
+  const reInput = (document.getElementById("searchRE")?.value || "").trim().toLowerCase();
+  let   leInput = (document.getElementById("searchLE")?.value || "").trim().toLowerCase();
   if (!leInput) leInput = reInput;
 
   const reFiltered = filterProducts(selected, reInput);
   const leFiltered = filterProducts(selected, leInput);
 
-  // Overlap BOTH eyes: keep only products present in both
+  // Overlap BOTH eyes
   const setLE = new Set(leFiltered.map(p => p["FULL NAME"]));
   const overlapping = reFiltered.filter(p => setLE.has(p["FULL NAME"]));
 
-  renderTable(overlapping);
+  renderCards(overlapping);
 }
 
 // Enter to search
 ["searchRE","searchLE"].forEach(id => {
-  document.getElementById(id).addEventListener("keydown", e => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener("keydown", e => {
     if (e.key === "Enter") { e.preventDefault(); showResults(); }
   });
 });
 
 // Button
-showBtn.addEventListener("click", showResults);
+if (showBtn) showBtn.addEventListener("click", showResults);
 
-/* =========================
-   Table rendering + sorting
-========================= */
-function renderTable(data){
+// ---------- Numeric parsers for sorting ----------
+function getNumericPrice(p){
+  // Parses first number in "1 BOX PRICE & UNIT" (e.g., "RM 120 / 30 lenses")
+  const text = (p["1 BOX PRICE & UNIT"] || "").replace(/,/g, "");
+  const m = text.match(/(\d+(\.\d+)?)/);
+  return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
+}
+
+function getNumericValuePerPair(p){
+  // Accepts formats like "RM 160 / pair", "160", "RM160", "", etc.
+  const text = (p["VALUE_PER_PAIR"] || "").toString().replace(/,/g, "").trim();
+  if (!text) return Number.POSITIVE_INFINITY;
+  const m = text.match(/(\d+(\.\d+)?)/);
+  return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
+}
+
+// ---------- Render: Sort bar + Card grid ----------
+function renderCards(data){
   const container = document.getElementById("results");
+  if (!container) return;
+
   if (!data || !data.length) {
     container.innerHTML = "<p>No matching products found.</p>";
     return;
@@ -380,7 +417,6 @@ function renderTable(data){
 
   window._lastResults = clean;
 
-  // Sort bar only (no toggle hint)
   container.innerHTML = `
     <div class="pane" style="margin:8px 0; padding:8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
       <b>Sort:</b>
@@ -389,35 +425,48 @@ function renderTable(data){
         <option value="name-desc">Product Z→A</option>
         <option value="price-asc">Price Low→High</option>
         <option value="price-desc">Price High→Low</option>
+        <option value="valuepair-asc">Value/Pair Low→High</option>
+        <option value="valuepair-desc">Value/Pair High→Low</option>
       </select>
     </div>
-    <div id="cardsGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:10px;"></div>
+    <div id="cardsGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:10px;"></div>
   `;
 
   buildCards(clean);
 
-  document.getElementById("sortSelect").addEventListener("change", e => {
-    const val = e.target.value;
-    const items = [...(window._lastResults || [])];
-    if (val.startsWith("name")) {
-      const dir = val.endsWith("asc") ? 1 : -1;
-      items.sort((a,b) => (a["FULL NAME"]||"").localeCompare(b["FULL NAME"]||"", undefined, {sensitivity:"base"}) * dir);
-    } else {
-      const dir = val.endsWith("asc") ? 1 : -1;
-      items.sort((a,b) => (getNumericPrice(a) - getNumericPrice(b)) * dir);
-      if (dir < 0) items.reverse();
-    }
-    buildCards(items);
-  });
+  const sortEl = document.getElementById("sortSelect");
+  if (sortEl) {
+    sortEl.addEventListener("change", e => {
+      const val = e.target.value;
+      const items = [...(window._lastResults || [])];
+
+      if (val.startsWith("name")) {
+        const dir = val.endsWith("asc") ? 1 : -1;
+        items.sort((a,b) => (a["FULL NAME"]||"").localeCompare(b["FULL NAME"]||"", undefined, {sensitivity:"base"}) * dir);
+      } else if (val.startsWith("price")) {
+        const dir = val.endsWith("asc") ? 1 : -1;
+        items.sort((a,b) => (getNumericPrice(a) - getNumericPrice(b)) * dir);
+      } else if (val.startsWith("valuepair")) {
+        const dir = val.endsWith("asc") ? 1 : -1;
+        items.sort((a,b) => (getNumericValuePerPair(a) - getNumericValuePerPair(b)) * dir);
+      }
+
+      buildCards(items);
+    });
+  }
 }
 
-
-// === Helper to render card grid (called by renderTable) ===
+// ---------- Card grid builder ----------
 function buildCards(list){
   const grid = document.getElementById("cardsGrid");
+  if (!grid) return;
+
   const H_DISPOSE = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
   const H_PRICE   = "1 BOX PRICE & UNIT";
   const H_MAT     = "COMFORT & MATERIAL";
+  const H_VALUE   = "VALUE_PER_PAIR";
+
+  const IMG_W = 320; // <— adjust this to resize all photos
 
   const html = list.map(p => {
     const name     = p["FULL NAME"] || "";
@@ -437,22 +486,24 @@ function buildCards(list){
         box-shadow:0 1px 0 rgba(0,0,0,.04);
       ">
         <div style="display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;">
-          <div style="flex:0 0 320px; max-width:100%;">
+          <div style="flex:0 0 ${IMG_W}px; max-width:100%;">
             ${
               hasPhoto
               ? `<img src="${photoURL}" alt="${name}"
-                     style="width:320px; max-width:100%; height:auto; border:1px solid #ccc; border-radius:6px;"
+                     style="width:${IMG_W}px; max-width:100%; height:auto; border:1px solid #ccc; border-radius:6px;"
                      onerror="this.style.display='none'">`
-              : `<div style="width:320px; height:120px; display:flex; align-items:center; justify-content:center; color:#666; border:1px dashed #ccc; border-radius:6px;">No photo</div>`
+              : `<div style="width:${IMG_W}px; height:${Math.round(IMG_W * 2/3)}px; display:flex; align-items:center; justify-content:center; color:#666; border:1px dashed #ccc; border-radius:6px;">No photo</div>`
             }
           </div>
 
-          <div style="flex:1; min-width:220px;">
-            <div style="font-weight:700; margin-bottom:6px;">${name}</div>
-            <div style="margin:2px 0;"><b>Dispose Period:</b> ${p[H_DISPOSE] || ""}</div>
-            <div style="margin:2px 0;"><b>Price Per Pack & Qty:</b> ${p[H_PRICE] || ""}</div>
-            <div style="margin:2px 0;"><b>Comfort & Material:</b> ${p[H_MAT] || ""}</div>
-          </div>
+<div style="flex:1; min-width:220px; display:flex; flex-direction:column; gap:8px;">
+  <div style="font-weight:700;">${name}</div>
+  <div><b>Dispose Period:</b> ${p[H_DISPOSE] || ""}</div>
+  <div><b>Price Per Pack & Qty:</b> ${p[H_PRICE] || ""}</div>
+  <div><b>Comfort & Material:</b> ${p[H_MAT] || ""}</div>
+  <div><b>Value per Pair:</b> ${p[H_VALUE] || "-"}</div>
+</div>
+
         </div>
       </div>
     `;
@@ -461,106 +512,6 @@ function buildCards(list){
   grid.innerHTML = html;
 }
 
-
-// === Small helpers ===
-function getNumericPrice(p){
-  // Tries to find the first number in "1 BOX PRICE & UNIT" (e.g., "RM 120 / 30 lenses")
-  const text = (p["1 BOX PRICE & UNIT"] || "").replace(/,/g, "");
-  const m = text.match(/(\d+(\.\d+)?)/);
-  return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
-}
-
-
-
-function setupSorting(table){
-  const thead = table.tHead;
-  const tbody = table.tBodies[0];
-  if (!thead || !tbody) return;
-
-  const ths = Array.from(thead.rows[0].cells);
-
-  ths.forEach(th => {
-    th.addEventListener('click', () => {
-      // Clear sort indicators on siblings
-      ths.forEach(t => { if (t !== th) { t.classList.remove('sort-asc','sort-desc'); t._asc = undefined; } });
-
-      const colIndex = th.cellIndex;
-      const asc = !th._asc;
-      th._asc = asc;
-      th.classList.toggle('sort-asc', asc);
-      th.classList.toggle('sort-desc', !asc);
-
-      // Collect pairs: [dataRow, imageRow|null]
-      const pairs = [];
-      let r = tbody.firstElementChild;
-      while (r) {
-        if (r.classList.contains('dataRow')) {
-          const dataRow = r;
-          const imgRow = (r.nextElementSibling && r.nextElementSibling.classList.contains('imageRow'))
-            ? r.nextElementSibling
-            : null;
-          pairs.push([dataRow, imgRow]);
-          r = imgRow ? imgRow.nextElementSibling : r.nextElementSibling;
-        } else {
-          // Skip stray imageRow if any
-          r = r.nextElementSibling;
-        }
-      }
-
-      // Sort by cell text from the DATA row only
-      pairs.sort((A, B) => {
-        const aCell = A[0].cells[colIndex];
-        const bCell = B[0].cells[colIndex];
-        const aText = aCell ? aCell.innerText.trim() : "";
-        const bText = bCell ? bCell.innerText.trim() : "";
-        const cmp = aText.localeCompare(bText, undefined, { numeric: true, sensitivity: 'base' });
-        return asc ? cmp : -cmp;
-      });
-
-      // Re-append in order, keep imageRow attached
-      const frag = document.createDocumentFragment();
-      for (const [dataRow, imgRow] of pairs) {
-        frag.appendChild(dataRow);
-        if (imgRow) frag.appendChild(imgRow);
-      }
-      tbody.appendChild(frag);
-    });
-  });
-}
-
-/* =========================
-   Image toggle
-========================= */
-function toggleImage(anchor, photoKey, name){
-  const row = anchor.closest('tr');
-  const nextRow = row.nextElementSibling;
-
-  // If image row already exists right after, remove it
-  if (nextRow && nextRow.classList.contains('imageRow')) {
-    nextRow.remove();
-    return false;
-  }
-
-  // Otherwise, create and insert it
-  const imgRow = document.createElement('tr');
-  imgRow.className = 'imageRow';
-  imgRow.innerHTML = `
-    <td colspan="4" style="text-align:center;">
-      <h3 style="margin:8px 0 6px;">${name}</h3>
-      ${
-        photoKey
-          ? `<img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photoKey}.png"
-                   alt="${name}"
-                   style="width:100%; max-width:400px; height:auto; border:1px solid #ccc; border-radius:6px; margin-top:6px;"
-                   onerror="this.style.display='none'">`
-          : `<div style="padding:12px; color:#666;">No photo available</div>`
-      }
-    </td>
-  `;
-  row.parentNode.insertBefore(imgRow, row.nextElementSibling);
-  return false; // prevent link navigation
-}
-window.toggleImage = toggleImage; // expose for inline onclick
 </script>
 
 </body>
