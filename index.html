@@ -1,227 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Contact Lens Selector</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
+  /* ========= Base ========= */
+  body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    font-size: 12px;
+    line-height: 1.3;
+    margin: 0;
+    background: #f8f8f5;
+    color: #0b3d2e;
+  }
+  h1 { font-size: 14px; text-align: center; margin: 10px 0 12px; }
+  h2 { font-size: 13px; margin: 6px 0 8px; }
 
+  /* ========= Layout ========= */
+  .container { max-width: 1100px; margin: 0 auto; padding: 10px; }
+  .wrap { width: 100%; min-width: 300px; }
 
-/* ========= Base ========= */
-body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-  font-size: 12px;
-  line-height: 1.3;
-  margin: 0;
-  background: #f8f8f5;
-  color: #0b3d2e;
-}
+  /* ========= Sections ========= */
+  .section {
+    background: #ffffe0;
+    border: 1px solid #d7d7cf;
+    border-radius: 6px;
+    padding: 8px;
+    margin: 8px 0;
+  }
+  .options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 6px 12px;
+  }
+  label { display: block; }
+  input[type="checkbox"] { margin-right: 4px; }
 
-h1 {
-  font-size: 14px;
-  text-align: center;
-  margin-bottom: 12px;
-}
+  /* ========= Results ========= */
+  .results { margin-top: 12px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    text-align: left;
+    min-width: 70px;
+    white-space: normal;
+    word-wrap: break-word;
+    vertical-align: top;
+  }
+  th { background: #e6e6d6; cursor: pointer; user-select: none; }
+  th.sort-asc::after { content: " ▲"; font-size: 10px; }
+  th.sort-desc::after { content: " ▼"; font-size: 10px; }
 
-h2 {
-  font-size: 13px;
-  margin: 6px 0 8px;
-}
+  /* Product links (inside table) */
+  #results a {
+    color: #0b3d2e;
+    text-decoration: none;
+    font-weight: 400;
+  }
+  #results a:hover { color: #095c42; text-decoration: underline; }
 
-/* ========= Layout ========= */
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 10px;
-}
+  /* Buttons */
+  button { background: #0b3d2e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+  button:disabled { background: #999; cursor: not-allowed; }
+  button:hover:not(:disabled) { background: #095c42; }
 
-.wrap {
-  width: 100%;
-  min-width: 300px;
-}
+  /* Search bars row */
+  .search-row { display: flex; gap: 4%; margin: 12px 0; }
+  .search-row input { flex: 1; padding: 6px; font-size: 12px; }
 
-/* ========= Sections ========= */
-.section {
-  background: #ffffe0;
-  border: 1px solid #d7d7cf;
-  border-radius: 6px;
-  padding: 8px;
-  margin: 8px 0;
-}
+  /* 🔒 Overlay for blackout */
+  #overlay {
+    position: fixed; inset: 0;
+    background: #EDEADF;
+    color: black;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    z-index: 9999;
+  }
 
-.options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 6px 12px;
-}
+  /* Make all checkboxes green */
+  input[type="checkbox"] { accent-color: #0b3d2e; }
+  input[type="checkbox"]:hover { filter: brightness(1.1); }
+  input[type="checkbox"]:focus {
+    outline: 2px solid #0b3d2e33;
+    outline-offset: 2px;
+  }
 
-label {
-  display: block;
-}
-
-input[type="checkbox"] {
-  margin-right: 4px;
-}
-
-/* ========= Summary Box ========= */
-.summary {
-  background: #ffffe0;
-  border: 1px solid #d7d7cf;
-  border-radius: 6px;
-  padding: 10px;
-  font-size: 12px;
-  margin: 12px 0;     /* space above/below */
-  position: relative;
-  top: auto;
-  max-width: 100%;
-}
-
-.summary h2 {
-  margin-top: 0;
-}
-
-.summary ul {  
-  padding-left: 15px;
-  margin: 0;
-}
-
-.desc {
-  font-size: 12px;
-  color: #0b3d2e;
-  margin: 4px 0 6px;
-}
-
-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
-table th, table td { 
-  border: 1px solid #ccc; 
-  padding: 6px 8px; /* a little more padding for readability */
-  text-align: left; 
-  min-width: 70px;  /* makes all columns wider */
-  white-space: normal;
-  word-wrap: break-word;
-}
-
-
-table th { background: #e6e6d6; cursor: pointer; }
-button { background: #0b3d2e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-top: 8px; }
-button:disabled { background: #999; cursor: not-allowed; }
-button:hover:not(:disabled) { background: #095c42; }
-@media (max-width: 600px) { .container { flex-direction: column; } .summary { position: relative; top: 0; margin-top: 10px; } 
-}
-
-/* Product links (inside table) */
-#results a {
-  color: #0b3d2e;      /* same dark green as your theme */
-  text-decoration: none;
-  font-weight: 400;
-}
-
-#results a:hover {
-  color: #095c42;       /* slightly brighter on hover */
-  text-decoration: underline;
-}
-
-/* 🔒 Overlay for blackout */
-#overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: #EDEADF;
-  color: black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  z-index: 9999;
-}
-
-/* Make all checkboxes green */
-input[type="checkbox"]{
-  accent-color: #0b3d2e;   /* Kiara green */
-}
-
-/* Optional polish */
-input[type="checkbox"]:hover{
-  filter: brightness(1.1);
-}
-input[type="checkbox"]:focus{
-  outline: 2px solid #0b3d2e33; /* soft green focus ring */
-  outline-offset: 2px;
-}
-
-
+  @media (max-width: 600px) {
+    .container { padding: 8px; }
+    .search-row { flex-direction: column; gap: 8px; }
+  }
 </style>
 </head>
 <body>
 
-
-
 <!-- 🔒 Locked screen -->
 <div id="overlay">🔒 Entering password...</div>
 
-
-<script>
-  function checkPassword() {
-    let password = "";
-    const correctPassword = ""; // change this
-
-    while (password !== correctPassword) {
-      password = prompt("Please enter password to use:");
-      if (password === null) {
-        document.getElementById("overlay").innerHTML = "Sorry, Access Denied.";
-        return false;
-      }
-      if (password !== correctPassword) {
-        alert("Wrong password. Try again.");
-      }
-    }
-    return true;
-  }
-
-  window.onload = function () {
-    if (checkPassword()) {
-      document.getElementById("overlay").style.display = "none";
-      document.getElementById("content").style.display = "block";
-    }
-  };
-</script>
-
-
-
-
-
-
-
-
-
-<div class="container">
+<!-- Main content (hidden until password ok) -->
+<div class="container" id="content" style="display:none;">
   <div class="wrap">
     <h1>Contact Lens Selector</h1>
 
     <!-- Q1: Clear or Colour -->
     <div class="section">
       <h2>1. Clear or coloured lenses?</h2>
-	<div class="options">
+      <div class="options">
         <label><input type="checkbox" name="q1" value="CLEAR">Clear</label>
         <label><input type="checkbox" name="q1" value="COLOUR">Colour</label>
-
       </div>
     </div>
 
- <!-- Q2: Vision -->
+    <!-- Q2: Modality -->
     <div class="section">
-      <h2>2. What type of prescription (RX)?</h2>
-	<p class="desc">Short/far sighted has 1 set number, eg: -2.25.    Astigmatism has 3 set numbers, eg: -2.25/-1.25 x 90.<br>Multifocal has ADD, eg: -2.25 ADD +1.50.</p>
-      <div class="options">
-        <label><input type="checkbox" name="q3" value="SPH">Short or Far Sighted (SPH)</label>
-        <label><input type="checkbox" name="q3" value="ASTIG"> With Astigmatism (ASTIG)</label>
-        <label><input type="checkbox" name="q3" value="MF">Multi-focal (MF)</label>
-      </div>
-    </div>
-
-    <!-- Q3: Modality -->
-    <div class="section">
-      <h2>3. What type of disposable?</h2>
+      <h2>2. What type of disposable?</h2>
       <div class="options">
         <label><input type="checkbox" name="q2" value="1 DAY">1 Day</label>
         <label><input type="checkbox" name="q2" value="2 WEEKS">2 Weeks</label>
@@ -230,12 +124,27 @@ input[type="checkbox"]:focus{
       </div>
     </div>
 
+    <!-- Q3: Vision -->
+    <div class="section">
+      <h2>3. What type of prescription (RX)?</h2>
+      <p class="desc">
+        Short/far sighted has 1 set number, eg: -2.25.
+        Astigmatism has 3 set numbers, eg: -2.25/-1.25 × 90.<br>
+        Multifocal has ADD, eg: -2.25 ADD +1.50.
+      </p>
+      <div class="options">
+        <label><input type="checkbox" name="q3" value="SPH">Short or Far Sighted (SPH)</label>
+        <label><input type="checkbox" name="q3" value="ASTIG">With Astigmatism (ASTIG)</label>
+        <label><input type="checkbox" name="q3" value="MF">Multi-focal (MF)</label>
+      </div>
+    </div>
+
     <!-- Q4: Material -->
     <div class="section">
       <h2>4. Wearing long hours? Have red eyes? Feel tired?</h2>
       <div class="options">
-        <label><input type="checkbox" name="q4" value="SIHY">High Oxygen Material (SiHy) - For long wearing hours, ie more than 8 hours</label>
-        <label><input type="checkbox" name="q4" value="HY">Standard Oxygen Material (Hy) - For short wearing hours, ie less than 8 hours</label>
+        <label><input type="checkbox" name="q4" value="SIHY">High Oxygen Material (SiHy) – For &gt; 8 hours</label>
+        <label><input type="checkbox" name="q4" value="HY">Standard Oxygen Material (Hy) – For &lt; 8 hours</label>
       </div>
     </div>
 
@@ -244,281 +153,413 @@ input[type="checkbox"]:focus{
       <h2>5. Do you need lenses with advanced technology?</h2>
       <div class="options">
         <label><input type="checkbox" name="q5" value="PREMIUM">Advanced Comfort & Performance</label>
-	<label><input type="checkbox" name="q5" value="STANDARD">Standard Comfort Design</label>
+        <label><input type="checkbox" name="q5" value="STANDARD">Standard Comfort Design</label>
       </div>
     </div>
 
-Search CYL RX product, type this format: S-5.00 C-1.25 x180
+    <!-- Q6: Loose or Not Loose -->
+    <div class="section">
+      <h2>6. Types of Packing?</h2>
+      <div class="options">
+        <label><input type="checkbox" name="q6" value="LOOSE">Loose</label>
+        <label><input type="checkbox" name="q6" value="NOT_LOOSE">Boxes</label>
+      </div>
+    </div>
 
-<div>
-  <button id="showBtn" disabled>Loading...</button>
-  <span id="btnText" style="margin-left:10px"></span>
+    <div class="section" style="display:block;">
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <span>Search by Prescription, type SPH or CYL, type this format: <b>S-5.00 C-1.25 x180</b></span>
+	</div>
+	<div style="height:10px"></div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <button id="showBtn" disabled>Loading...</button>
+        <span id="btnText" style="opacity:0.8;"></span>
+      </div>
+
+      <div class="search-row">
+        <input type="text" id="searchRE" placeholder="Search Bar Right">
+        <input type="text" id="searchLE" placeholder="Search Bar Left (Use if needed)">
+      </div>
+    </div>
+
+    <div class="results" id="results"></div>
+    <div style="height:400px;"></div> <!-- Spacer -->
+  </div>
 </div>
-
-<div style="display:flex; gap:4%; margin:12px 0;">
-  <input type="text" id="searchRE" placeholder="Search Bar Right"
-         style="flex:1; padding:6px; font-size:12px;">
-  <input type="text" id="searchLE" placeholder="Search Bar Left (Use if needed)"
-         style="flex:1; padding:6px; font-size:12px;">
-</div>
-
-
-<div class="results" id="results"></div>
-
-
-
-  
-</div>
-
-
 
 <script>
+/* =========================
+   Password overlay
+========================= */
+(function setupPasswordGate(){
+  const overlay = document.getElementById("overlay");
+  const content = document.getElementById("content");
+  function checkPassword() {
+    let password = "";
+    const correctPassword = ""; // set your password here (empty means no password)
+    while (password !== correctPassword) {
+      password = prompt("Please enter password to use:");
+      if (password === null) {
+        overlay.textContent = "Sorry, Access Denied.";
+        return false;
+      }
+      if (password !== correctPassword) alert("Wrong password. Try again.");
+    }
+    return true;
+  }
+  window.addEventListener("load", () => {
+    if (checkPassword()) {
+      overlay.style.display = "none";
+      content.style.display = "block";
+    }
+  });
+})();
+</script>
+
+<script>
+/* =========================
+   Data + UI wiring
+========================= */
 const csvUrl = 'https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL%20DATABASE.csv';
 let products = [];
-const button = document.getElementById('showBtn');
+let csvLoaded = false;
 
-// Fetch CSV
-fetch(csvUrl)
-  .then(res => res.text())
+const showBtn = document.getElementById('showBtn');
+const btnText = document.getElementById('btnText');
+
+function parseCSV(text){
+  // Robust CSV splitter that respects quoted commas
+  const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter(l => l.trim() !== '');
+  if (lines.length < 2) return { headers: [], rows: [] };
+  const splitRow = row => row.match(/(?:,|\n|^)(?:"([^"]*(?:""[^"]*)*)"|([^",\n]*))/g)
+    ?.map(s => s.replace(/^,/, ''))
+    ?.map(s => s.replace(/^"|"$/g,'').replace(/""/g,'"')) || [];
+  const headers = splitRow(lines[0]).map(h => h.trim());
+  const rows = lines.slice(1).map(line => splitRow(line));
+  return { headers, rows };
+}
+
+// Load CSV
+fetch(csvUrl, { cache: 'no-store' })
+  .then(res => { if (!res.ok) throw new Error("HTTP "+res.status); return res.text(); })
   .then(text => {
-    const rows = text.trim().split('\n').map(r => r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
-    const headers = rows[0].map(h => h.replace(/^"|"$/g,'').trim());
-
-    products = rows.slice(1).map(r => {
-      let obj = {};
-      r.forEach((val,i) => {
-        const key = headers[i].replace(/^"|"$/g,'').trim();
-        obj[key] = val.replace(/^"|"$/g,'').trim();
-      });
+    const { headers, rows } = parseCSV(text);
+    products = rows.map(r => {
+      const obj = {};
+      headers.forEach((h,i) => obj[h] = (r[i] ?? '').trim());
       return obj;
     });
-
-    console.log(products[0]); // debug first row
-    button.disabled = false;
-    button.textContent = 'Show Results';
+    csvLoaded = true;
+    showBtn.disabled = false;
+    showBtn.textContent = 'Show Results';
+    btnText.textContent = '';
   })
-  .catch(err => console.error('CSV Load Error:', err));
-
-// Update summary
-document.querySelectorAll("input[type=checkbox]").forEach(input => {
-  input.addEventListener("change", () => {
-    const list = document.getElementById("summaryList");
-    const checked = document.querySelectorAll("input[type=checkbox]:checked");
-    list.innerHTML = checked.length ? '' : '<li>No selections yet</li>';
-    checked.forEach(c => list.appendChild(Object.assign(document.createElement('li'), {textContent: c.parentElement.textContent.trim()})));
-  });
-});
-
-// Show results
-function showResults() {
-  // Collect all selected checkboxes
-  const selected = {q1:[], q2:[], q3:[], q4:[], q5:[]};
-  document.querySelectorAll("input[type=checkbox]:checked").forEach(c => {
-    selected[c.name].push(c.value.toUpperCase());
+  .catch(err => {
+    console.error("CSV Load Error:", err);
+    showBtn.disabled = true;
+    showBtn.textContent = 'Load failed';
+    btnText.textContent = 'Please refresh to retry.';
   });
 
-  // Get the search queries
-  const reInput = document.getElementById("searchRE").value.trim().toLowerCase();
-  let leInput = document.getElementById("searchLE").value.trim().toLowerCase();
+// Build selected filters
+function getSelections(){
+  const selected = { q1:[], q2:[], q3:[], q4:[], q5:[], q6:[] };
+  document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
+    if (selected[c.name]) selected[c.name].push(c.value.toUpperCase());
+  });
+  return selected;
+}
 
-  // If LE is empty, copy RE
+// Core filter (per eye query)
+function filterProducts(selected, query){
+  const q1Col = "LENS TYPE (CLEAR, COLOUR)";
+  const mCol  = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
+  const vCol  = "VISION (SPH, ASTIG, MF)";
+  const matCol= "MATERIAL (SIHY, HY)";
+  const gCol  = "GRADE (PREMIUM, STANDARD)";
+
+  const terms = (query || '').toLowerCase().split(/\s+/).filter(Boolean);
+
+  return products.filter(p => {
+    const lensType = (p[q1Col]  || '').trim().toUpperCase();
+    const modality = (p[mCol]   || '').trim().toUpperCase();
+    const vision   = (p[vCol]   || '').trim().toUpperCase();
+    const material = (p[matCol] || '').trim().toUpperCase();
+    const grade    = (p[gCol]   || '').trim().toUpperCase();
+
+    if (selected.q1.length && !selected.q1.includes(lensType)) return false;
+    if (selected.q2.length && !selected.q2.includes(modality)) return false;
+    if (selected.q3.length && !selected.q3.includes(vision))   return false;
+    if (selected.q4.length && !selected.q4.includes(material)) return false;
+    if (selected.q5.length && !selected.q5.includes(grade))    return false;
+
+    // Q6: Loose vs Not Loose — detect by FULL NAME containing the word "loose"
+    const fullName = p["FULL NAME"] || "";
+    const isLoose = /\bloose\b/i.test(fullName);
+    if (selected.q6.length) {
+      const wantsLoose = selected.q6.includes("LOOSE");
+      const wantsNotLoose = selected.q6.includes("NOT_LOOSE");
+      if (wantsLoose !== wantsNotLoose) {
+        if (wantsLoose && !isLoose) return false;
+        if (wantsNotLoose && isLoose) return false;
+      }
+    }
+
+    // Fuzzy search across row
+    if (terms.length) {
+      const rowText = Object.values(p).join(" ").toLowerCase();
+      if (!terms.every(t => rowText.includes(t))) return false;
+    }
+
+    return true;
+  });
+}
+
+// Show Results
+function showResults(){
+  if (!csvLoaded) return;
+
+  const selected = getSelections();
+
+  const reInput = (document.getElementById("searchRE").value || "").trim().toLowerCase();
+  let   leInput = (document.getElementById("searchLE").value || "").trim().toLowerCase();
   if (!leInput) leInput = reInput;
 
-  // Filter products by checkboxes and fuzzy search
-  function filterProducts(query) {
-    return products.filter(p => {
-      const q1Col = "LENS TYPE (CLEAR, COLOUR)";   
-      const mCol = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
-      const vCol = "VISION (SPH, ASTIG, MF)";
-      const matCol = "MATERIAL (SIHY, HY)";
-      const gCol = "GRADE (PREMIUM, STANDARD)";
+  const reFiltered = filterProducts(selected, reInput);
+  const leFiltered = filterProducts(selected, leInput);
 
-      const lensType = p[q1Col]?.trim().toUpperCase();
-      const modality = p[mCol]?.trim().toUpperCase();
-      const vision = p[vCol]?.trim().toUpperCase();
-      const material = p[matCol]?.trim().toUpperCase();
-      const grade = p[gCol]?.trim().toUpperCase();
-
-      // Filter by selections
-      if (selected.q1.length && !selected.q1.includes(lensType)) return false;
-      if (selected.q2.length && !selected.q2.includes(modality)) return false;
-      if (selected.q3.length && !selected.q3.includes(vision)) return false;
-      if (selected.q4.length && !selected.q4.includes(material)) return false;
-      if (selected.q5.length && !selected.q5.includes(grade)) return false;
-
-      // Fuzzy search
-      if (query) {
-        const rowText = Object.values(p).join(" ").toLowerCase();
-        const terms = query.split(/\s+/).filter(Boolean);
-        if (!terms.every(t => rowText.includes(t))) return false;
-      }
-
-      return true;
-    });
-  }
-
-  // Filter each eye
-  const reFiltered = filterProducts(reInput);
-  const leFiltered = filterProducts(leInput);
-
-  // Keep only products that exist in BOTH results (overlap)
-  const overlapping = reFiltered.filter(p1 =>
-      leFiltered.some(p2 => p2["FULL NAME"] === p1["FULL NAME"])
-  );
+  // Overlap BOTH eyes: keep only products present in both
+  const setLE = new Set(leFiltered.map(p => p["FULL NAME"]));
+  const overlapping = reFiltered.filter(p => setLE.has(p["FULL NAME"]));
 
   renderTable(overlapping);
 }
 
-
-// Run search when pressing Enter
-document.getElementById("searchRE").addEventListener("keypress", function(e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    showResults();
-  }
+// Enter to search
+["searchRE","searchLE"].forEach(id => {
+  document.getElementById(id).addEventListener("keydown", e => {
+    if (e.key === "Enter") { e.preventDefault(); showResults(); }
+  });
 });
 
-document.getElementById("searchLE").addEventListener("keypress", function(e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    showResults();
-  }
-});
-</script>
+// Button
+showBtn.addEventListener("click", showResults);
 
-
-<script>
-function renderTable(data) {
+/* =========================
+   Table rendering + sorting
+========================= */
+// === Replace your old renderTable with this card-based version ===
+function renderTable(data){
   const container = document.getElementById("results");
-  if (!data.length) {
+  if (!data || !data.length) {
     container.innerHTML = "<p>No matching products found.</p>";
     return;
   }
 
   // De-duplicate by FULL NAME
   const seen = new Set();
-  data = data.filter(p => {
-    if (seen.has(p["FULL NAME"])) return false;
-    seen.add(p["FULL NAME"]);
+  const clean = data.filter(p => {
+    const key = p["FULL NAME"] || "";
+    if (seen.has(key)) return false;
+    seen.add(key);
     return true;
   });
 
-  const headers = [
-    "FULL NAME",
-    "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)",
-    "1 BOX PRICE & UNIT",
-    "COMFORT & MATERIAL"
-  ];
+  // Keep a copy so the sort dropdown can re-render
+  window._lastResults = clean;
 
-  // Updated wording since images show by default
-  const headerMap = {
-    "FULL NAME": "Product & Image",
-    "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)": "Dispose Period",
-    "1 BOX PRICE & UNIT": "Price Per Pack & Qty",
-    "COMFORT & MATERIAL": "Comfort & Material",
-  };
+  // Build a simple sort bar + cards grid shell
+  container.innerHTML = `
+    <div class="pane" style="margin:8px 0; padding:8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <b>Sort:</b>
+      <select id="sortSelect" style="padding:4px; font-size:12px;">
+        <option value="name-asc">Product A→Z</option>
+        <option value="name-desc">Product Z→A</option>
+        <option value="price-asc">Price Low→High</option>
+        <option value="price-desc">Price High→Low</option>
+      </select>
+      <span style="opacity:.75;">Click a card’s “Hide photo / Show photo” to toggle image.</span>
+    </div>
+    <div id="cardsGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:10px;"></div>
+  `;
 
-  let table = "<table><thead><tr>" +
-    headers.map(h => `<th onclick="sortTable(this)">${headerMap[h]}</th>`).join('') +
-    "</tr></thead><tbody>";
+  // First render without sorting (defaults to current order)
+  buildCards(clean);
 
-  data.forEach(p => {
-    // 1) Main product row (keeps click-to-toggle behavior)
-    let rowHTML = "<tr>" + headers.map(h => {
-      if (h === "FULL NAME") {
-        const name = p[h] || "";
-        const photo = (p["PHOTO"] || "").trim();
-        return `<td>
-                  <a href="#" onclick="toggleImage(this,'${photo}','${name}'); return false;">
-                    ${name}
-                  </a>
-                </td>`;
-      }
-      return `<td>${p[h] || ""}</td>`;
-    }).join('') + "</tr>";
-
-    // 2) Default image row (inserted immediately)
-    const photoKey = (p["PHOTO"] || "").trim();
-    const name = p["FULL NAME"] || "";
-    const hasPhoto = !!photoKey;
-
-    rowHTML += `
-      <tr class="imageRow">
-        <td colspan="4" style="text-align:center;">
-          <h3 style="margin:8px 0 6px;">${name}</h3>
-          ${
-            hasPhoto
-              ? `<img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photoKey}.png"
-                       alt="${name}"
-                       style="width:100%; max-width:400px; height:auto; border:1px solid #ccc; border-radius:6px; margin-top:6px;"
-                       onerror="this.style.display='none'">`
-              : `<div style="padding:12px; color:#666;">No photo available</div>`
-          }
-        </td>
-      </tr>
-    `;
-
-    table += rowHTML;
+  // Hook sorter
+  document.getElementById("sortSelect").addEventListener("change", e => {
+    const val = e.target.value;
+    const items = [...(window._lastResults || [])];
+    if (val.startsWith("name")) {
+      const dir = val.endsWith("asc") ? 1 : -1;
+      items.sort((a,b) => (a["FULL NAME"]||"").localeCompare(b["FULL NAME"]||"", undefined, {sensitivity:"base"}) * dir);
+    } else {
+      // price parse from "1 BOX PRICE & UNIT"
+      const dir = val.endsWith("asc") ? 1 : -1;
+      items.sort((a,b) => (getNumericPrice(a) - getNumericPrice(b)) * dir);
+    }
+    buildCards(items);
   });
-
-  table += "</tbody></table>";
-  container.innerHTML = table;
 }
-</script>
 
+// === Helper to render card grid (called by renderTable) ===
+function buildCards(list){
+  const grid = document.getElementById("cardsGrid");
+  const H_DISPOSE = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
+  const H_PRICE   = "1 BOX PRICE & UNIT";
+  const H_MAT     = "COMFORT & MATERIAL";
 
+  const html = list.map(p => {
+    const name     = p["FULL NAME"] || "";
+    const photoKey = (p["PHOTO"] || "").trim();
+    const hasPhoto = !!photoKey;
+    const photoURL = hasPhoto
+      ? `https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photoKey}.png`
+      : "";
 
+    return `
+      <div class="pane lens-card" style="padding:10px; margin:0;">
+        <div style="display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;">
+          <div style="flex:0 0 160px; max-width:100%;">
+            ${
+              hasPhoto
+              ? `<img src="${photoURL}" alt="${name}"
+                     style="width:160px; max-width:100%; height:auto; border:1px solid #ccc; border-radius:6px;"
+                     onerror="this.style.display='none'">`
+              : `<div style="width:160px; height:120px; display:flex; align-items:center; justify-content:center; color:#666; border:1px dashed #ccc; border-radius:6px;">No photo</div>`
+            }
+          </div>
 
+          <div style="flex:1; min-width:220px;">
+            <div style="font-weight:700; margin-bottom:6px;">${name}</div>
+            <div style="margin:2px 0;"><b>Dispose Period:</b> ${p[H_DISPOSE] || ""}</div>
+            <div style="margin:2px 0;"><b>Price Per Pack & Qty:</b> ${p[H_PRICE] || ""}</div>
+            <div style="margin:2px 0;"><b>Comfort & Material:</b> ${p[H_MAT] || ""}</div>
 
-<script>
+            <div style="margin-top:8px;">
+              <a href="#" onclick="return toggleCardPhoto(this)" style="color:#0b3d2e; text-decoration:none;">Hide photo</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
 
+  grid.innerHTML = html;
+}
 
-// Toggle image under row
-function toggleImage(link, photo, name) {
-  const row = link.closest("tr");
+// === Small helpers ===
+function getNumericPrice(p){
+  // Tries to find the first number in "1 BOX PRICE & UNIT" (e.g., "RM 120 / 30 lenses")
+  const text = (p["1 BOX PRICE & UNIT"] || "").replace(/,/g, "");
+  const m = text.match(/(\d+(\.\d+)?)/);
+  return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
+}
+
+// Toggle link inside a card: Hide/Show the left image panel
+function toggleCardPhoto(link){
+  // find the nearest card, then its first child (image wrapper)
+  const card = link.closest(".lens-card");
+  if (!card) return false;
+  const imgWrap = card.querySelector("div > div"); // first inner div (image column)
+  if (!imgWrap) return false;
+
+  const currentlyHidden = imgWrap.style.display === "none";
+  imgWrap.style.display = currentlyHidden ? "" : "none";
+  link.textContent = currentlyHidden ? "Hide photo" : "Show photo";
+  return false; // prevent navigation
+}
+
+function setupSorting(table){
+  const thead = table.tHead;
+  const tbody = table.tBodies[0];
+  if (!thead || !tbody) return;
+
+  const ths = Array.from(thead.rows[0].cells);
+
+  ths.forEach(th => {
+    th.addEventListener('click', () => {
+      // Clear sort indicators on siblings
+      ths.forEach(t => { if (t !== th) { t.classList.remove('sort-asc','sort-desc'); t._asc = undefined; } });
+
+      const colIndex = th.cellIndex;
+      const asc = !th._asc;
+      th._asc = asc;
+      th.classList.toggle('sort-asc', asc);
+      th.classList.toggle('sort-desc', !asc);
+
+      // Collect pairs: [dataRow, imageRow|null]
+      const pairs = [];
+      let r = tbody.firstElementChild;
+      while (r) {
+        if (r.classList.contains('dataRow')) {
+          const dataRow = r;
+          const imgRow = (r.nextElementSibling && r.nextElementSibling.classList.contains('imageRow'))
+            ? r.nextElementSibling
+            : null;
+          pairs.push([dataRow, imgRow]);
+          r = imgRow ? imgRow.nextElementSibling : r.nextElementSibling;
+        } else {
+          // Skip stray imageRow if any
+          r = r.nextElementSibling;
+        }
+      }
+
+      // Sort by cell text from the DATA row only
+      pairs.sort((A, B) => {
+        const aCell = A[0].cells[colIndex];
+        const bCell = B[0].cells[colIndex];
+        const aText = aCell ? aCell.innerText.trim() : "";
+        const bText = bCell ? bCell.innerText.trim() : "";
+        const cmp = aText.localeCompare(bText, undefined, { numeric: true, sensitivity: 'base' });
+        return asc ? cmp : -cmp;
+      });
+
+      // Re-append in order, keep imageRow attached
+      const frag = document.createDocumentFragment();
+      for (const [dataRow, imgRow] of pairs) {
+        frag.appendChild(dataRow);
+        if (imgRow) frag.appendChild(imgRow);
+      }
+      tbody.appendChild(frag);
+    });
+  });
+}
+
+/* =========================
+   Image toggle
+========================= */
+function toggleImage(anchor, photoKey, name){
+  const row = anchor.closest('tr');
   const nextRow = row.nextElementSibling;
 
-  // If next row is already the image, remove it
-  if (nextRow && nextRow.classList.contains("imageRow")) {
+  // If image row already exists right after, remove it
+  if (nextRow && nextRow.classList.contains('imageRow')) {
     nextRow.remove();
-    return;
+    return false;
   }
 
-// Otherwise, insert image row
-const imgRow = document.createElement("tr");
-imgRow.classList.add("imageRow");
-imgRow.innerHTML = `<td colspan="4" style="text-align:center;">
-                      <h3>${name}</h3>
-                      <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photo}.png" 
-                           alt="${name}" 
-                           style="width:100%; max-width:400px; height:auto; border:1px solid #ccc; border-radius:6px; margin-top:10px;">
-                    </td>`;
-row.parentNode.insertBefore(imgRow, row.nextSibling);
-
+  // Otherwise, create and insert it
+  const imgRow = document.createElement('tr');
+  imgRow.className = 'imageRow';
+  imgRow.innerHTML = `
+    <td colspan="4" style="text-align:center;">
+      <h3 style="margin:8px 0 6px;">${name}</h3>
+      ${
+        photoKey
+          ? `<img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photoKey}.png"
+                   alt="${name}"
+                   style="width:100%; max-width:400px; height:auto; border:1px solid #ccc; border-radius:6px; margin-top:6px;"
+                   onerror="this.style.display='none'">`
+          : `<div style="padding:12px; color:#666;">No photo available</div>`
+      }
+    </td>
+  `;
+  row.parentNode.insertBefore(imgRow, row.nextElementSibling);
+  return false; // prevent link navigation
 }
-
-// Sort table
-function sortTable(header) {
-  const table = header.closest("table");
-  const index = [...header.parentNode.children].indexOf(header);
-  const rows = [...table.tBodies[0].rows];
-  const asc = !header.asc;
-  rows.sort((a,b) => a.cells[index].innerText.localeCompare(b.cells[index].innerText, undefined, {numeric:true}) * (asc ? 1 : -1));
-  rows.forEach(r => table.tBodies[0].appendChild(r));
-  header.asc = asc;
-}
-
-// Attach button
-button.addEventListener("click", showResults);
+window.toggleImage = toggleImage; // expose for inline onclick
 </script>
-
-
-
-<!-- Spacer at the bottom for scrolling -->
-<div style="height:400px;"></div>
-
-
-
 
 </body>
 </html>
