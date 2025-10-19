@@ -5,36 +5,30 @@
 <title>Contact Lens Selector</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-* {
-  font-size: 10px;
-  letter-spacing: 1px;
-}
 
-html, body {
-  font-size: 10px;
-  -webkit-text-size-adjust: none;
-}
 
-body { 
+/* ========= Base ========= */
+body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-size: 12px;
+  line-height: 1.3;
   margin: 0;
   background: #f8f8f5;
-  color: black;
+  color: #0b3d2e;
 }
 
 h1 {
-  font-size: 10px;
+  font-size: 14px;
   text-align: center;
   margin-bottom: 12px;
 }
 
-h2 { 
-  font-size: 10px;
-  text-align: left;
+h2 {
+  font-size: 13px;
   margin: 6px 0 8px;
-  color: black;
 }
 
+/* ========= Layout ========= */
 .container {
   max-width: 1100px;
   margin: 0 auto;
@@ -48,8 +42,9 @@ h2 {
 
 /* ========= Sections ========= */
 .section {
-  background: #E5F0D1;
-  border: 0.5px solid #999;
+  background: #ffffe0;
+  border: 1px solid #d7d7cf;
+  border-radius: 6px;
   padding: 8px;
   margin: 8px 0;
 }
@@ -66,16 +61,16 @@ label {
 
 input[type="checkbox"] {
   margin-right: 4px;
-  accent-color: #5e3a87; /* purple accent */
 }
 
 /* ========= Summary Box ========= */
 .summary {
-  background: #f8f8f5;
-  border: 0.5px solid #999;
+  background: #ffffe0;
+  border: 1px solid #d7d7cf;
+  border-radius: 6px;
   padding: 10px;
-  font-size: 10px;
-  margin: 12px 0;
+  font-size: 12px;
+  margin: 12px 0;     /* space above/below */
   position: relative;
   top: auto;
   max-width: 100%;
@@ -91,62 +86,42 @@ input[type="checkbox"] {
 }
 
 .desc {
-  font-size: 10px;
-  color: #333;
+  font-size: 12px;
+  color: #0b3d2e;
   margin: 4px 0 6px;
 }
 
-/* ========= Table ========= */
-table { 
-  width: 100%; 
-  border-collapse: collapse; 
-  margin-top: 10px; 
-  font-size: 10px; 
-  table-layout: auto;
-}
-
+table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
 table th, table td { 
-  border: 0.5px solid #999; 
-  padding: 6px 8px; 
+  border: 1px solid #ccc; 
+  padding: 6px 8px; /* a little more padding for readability */
   text-align: left; 
-  min-width: 70px;
+  min-width: 70px;  /* makes all columns wider */
   white-space: normal;
   word-wrap: break-word;
-  overflow-wrap: break-word;
 }
 
-table th { 
-  background: #E5F0D1;
-  color: black;
-  cursor: pointer;
-}
 
-/* ========= Buttons ========= */
-button { 
-  background: #5e3a87;   /* purple button */
-  color: white; 
-  border: 0.5px solid #333; 
-  padding: 6px 12px; 
-  cursor: pointer; 
-  margin-top: 8px; 
-}
-
+table th { background: #e6e6d6; cursor: pointer; }
+button { background: #0b3d2e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-top: 8px; }
 button:disabled { background: #999; cursor: not-allowed; }
-button:hover:not(:disabled) { background: #7c4dff; }
+button:hover:not(:disabled) { background: #095c42; }
+@media (max-width: 600px) { .container { flex-direction: column; } .summary { position: relative; top: 0; margin-top: 10px; } 
+}
 
-/* ========= Links ========= */
+/* Product links (inside table) */
 #results a {
-  color: #101F01;
+  color: #0b3d2e;      /* same dark green as your theme */
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 400;
 }
 
 #results a:hover {
-  color: #5e3a87;
+  color: #095c42;       /* slightly brighter on hover */
   text-decoration: underline;
 }
 
-/* ========= Overlay ========= */
+/* 🔒 Overlay for blackout */
 #overlay {
   position: fixed;
   top: 0; left: 0;
@@ -156,15 +131,24 @@ button:hover:not(:disabled) { background: #7c4dff; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 1.2rem;
   z-index: 9999;
 }
 
-/* ========= Optional Background Classes ========= */
-.paleviolet { background: #D0C5DB; } /* soft purple */
-.paleblue   { background: #BECEE8; }
-.comfort    { background: #E5F0D1; }
-.offwhite   { background: #f8f8f5; }
+/* Make all checkboxes green */
+input[type="checkbox"]{
+  accent-color: #0b3d2e;   /* Kiara green */
+}
+
+/* Optional polish */
+input[type="checkbox"]:hover{
+  filter: brightness(1.1);
+}
+input[type="checkbox"]:focus{
+  outline: 2px solid #0b3d2e33; /* soft green focus ring */
+  outline-offset: 2px;
+}
+
 
 </style>
 </head>
@@ -212,7 +196,7 @@ button:hover:not(:disabled) { background: #7c4dff; }
 
 <div class="container">
   <div class="wrap">
-    <h1>Welcome to Kiara Optometry Contact Lens Crawler</h1>
+    <h1>Contact Lens Selector</h1>
 
     <!-- Q1: Clear or Colour -->
     <div class="section">
@@ -273,9 +257,9 @@ Search CYL RX product, type this format: S-5.00 C-1.25 x180
 
 <div style="display:flex; gap:4%; margin:12px 0;">
   <input type="text" id="searchRE" placeholder="Search Bar Right"
-         style="flex:1; padding:6px; font-size:10px;">
+         style="flex:1; padding:6px; font-size:12px;">
   <input type="text" id="searchLE" placeholder="Search Bar Left (Use if needed)"
-         style="flex:1; padding:6px; font-size:10px;">
+         style="flex:1; padding:6px; font-size:12px;">
 </div>
 
 
@@ -400,16 +384,18 @@ document.getElementById("searchLE").addEventListener("keypress", function(e) {
     showResults();
   }
 });
+</script>
 
-// Render table
+
+<script>
 function renderTable(data) {
   const container = document.getElementById("results");
-  if (!data.length) { 
-    container.innerHTML = "<p>No matching products found.</p>"; 
-    return; 
+  if (!data.length) {
+    container.innerHTML = "<p>No matching products found.</p>";
+    return;
   }
 
-  // Keep only first occurrence of each FULL NAME
+  // De-duplicate by FULL NAME
   const seen = new Set();
   data = data.filter(p => {
     if (seen.has(p["FULL NAME"])) return false;
@@ -417,28 +403,75 @@ function renderTable(data) {
     return true;
   });
 
-  const headers = ["FULL NAME","MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)","1 BOX PRICE & UNIT","COMFORT & MATERIAL"];
+  const headers = [
+    "FULL NAME",
+    "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)",
+    "1 BOX PRICE & UNIT",
+    "COMFORT & MATERIAL"
+  ];
+
+  // Updated wording since images show by default
   const headerMap = {
-    "FULL NAME": "Product (Click on product to see image)",
+    "FULL NAME": "Product & Image",
     "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)": "Dispose Period",
     "1 BOX PRICE & UNIT": "Price Per Pack & Qty",
     "COMFORT & MATERIAL": "Comfort & Material",
   };
 
-  let table = "<table><thead><tr>" + headers.map(h => `<th onclick="sortTable(this)">${headerMap[h]}</th>`).join('') + "</tr></thead><tbody>";
+  let table = "<table><thead><tr>" +
+    headers.map(h => `<th onclick="sortTable(this)">${headerMap[h]}</th>`).join('') +
+    "</tr></thead><tbody>";
 
   data.forEach(p => {
-    table += "<tr>" + headers.map(h => {
+    // 1) Main product row (keeps click-to-toggle behavior)
+    let rowHTML = "<tr>" + headers.map(h => {
       if (h === "FULL NAME") {
-        return `<td><a href="#" onclick="toggleImage(this,'${p['PHOTO']}','${p[h]}'); return false;">${p[h]}</a></td>`;
+        const name = p[h] || "";
+        const photo = (p["PHOTO"] || "").trim();
+        return `<td>
+                  <a href="#" onclick="toggleImage(this,'${photo}','${name}'); return false;">
+                    ${name}
+                  </a>
+                </td>`;
       }
-      return `<td>${p[h]}</td>`;
+      return `<td>${p[h] || ""}</td>`;
     }).join('') + "</tr>";
+
+    // 2) Default image row (inserted immediately)
+    const photoKey = (p["PHOTO"] || "").trim();
+    const name = p["FULL NAME"] || "";
+    const hasPhoto = !!photoKey;
+
+    rowHTML += `
+      <tr class="imageRow">
+        <td colspan="4" style="text-align:center;">
+          <h3 style="margin:8px 0 6px;">${name}</h3>
+          ${
+            hasPhoto
+              ? `<img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photoKey}.png"
+                       alt="${name}"
+                       style="width:100%; max-width:400px; height:auto; border:1px solid #ccc; border-radius:6px; margin-top:6px;"
+                       onerror="this.style.display='none'">`
+              : `<div style="padding:12px; color:#666;">No photo available</div>`
+          }
+        </td>
+      </tr>
+    `;
+
+    table += rowHTML;
   });
 
   table += "</tbody></table>";
   container.innerHTML = table;
 }
+</script>
+
+
+
+
+
+<script>
+
 
 // Toggle image under row
 function toggleImage(link, photo, name) {
@@ -489,4 +522,3 @@ button.addEventListener("click", showResults);
 
 </body>
 </html>
-
