@@ -478,7 +478,6 @@ function renderCards(data){
 }
 
 // ---------- Card grid builder ----------
-// ---------- Card grid builder ----------
 function buildCards(list){
   const grid = document.getElementById("cardsGrid");
   if (!grid) return;
@@ -487,13 +486,13 @@ function buildCards(list){
   const H_PRICE   = "1 BOX PRICE & UNIT";
   const H_MAT     = "COMFORT & MATERIAL";
   const H_VALUE   = "VALUE_PER_PAIR";
-  const H_PROMO   = "PROMO"; // 👈 new header
+  const H_PROMO   = "PROMO";
   const IMG_W = 320;
 
   const html = list.map(p => {
     const name     = p["FULL NAME"] || "";
-    const promo    = (p[H_PROMO] || "").trim(); // 👈 fetch promo
-    const hasPromo = promo && promo.length > 0;
+    const promo    = (p[H_PROMO] || "").trim();
+    const hasPromo = promo.length > 0;
 
     const photoKey = (p["PHOTO"] || "").trim();
     const hasPhoto = !!photoKey;
@@ -532,6 +531,7 @@ function buildCards(list){
             <div><b>Price Per Pack & Qty:</b> ${p[H_PRICE] || ""}</div>
             <div><b>Comfort & Material:</b> ${p[H_MAT] || ""}</div>
             <div><b>Value per Pair:</b> ${p[H_VALUE] || "-"}</div>
+            <div><b>Promo:</b> ${hasPromo ? promo : "Not at the moment"}</div>
           </div>
         </div>
       </div>
@@ -540,6 +540,7 @@ function buildCards(list){
 
   grid.innerHTML = html;
 }
+
 
 
 </script>
@@ -588,4 +589,5 @@ document.addEventListener('DOMContentLoaded', function(){
 
 </body>
 </html>
+
 
