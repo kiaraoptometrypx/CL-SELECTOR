@@ -172,7 +172,7 @@
 
     <!-- Q4: Material -->
     <div class="section">
-      <h2>4. What type of oxygen level? (Long hours recommend to use high oxygen; keeps eye healthy)</h2>
+      <h2>4. What type of oxygen level? (High Oxygen keeps eyes healthy if wear long hours)</h2>
       <div class="options">
         <label><input type="checkbox" name="q4" value="SIHY">High Oxygen Lenses (SiHy)</label>
         <label><input type="checkbox" name="q4" value="HY">Standard Oxygen (Hy)</label>
@@ -201,6 +201,11 @@
     <div class="section" style="display:block;">
       <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
         <span>Search by Prescription, type SPH or CYL, type this format: <b>S-5.00 C-1.25 x180</b></span>
+      <div class="search-row">
+        <input type="text" id="searchRE" placeholder="Search Bar Right">
+        <input type="text" id="searchLE" placeholder="Search Bar Left (Use if needed)">
+      </div>
+		  
 	</div>
 	<div style="height:10px"></div>
 		<button id="promoBtn" disabled>Show Promo Only</button>
@@ -211,10 +216,6 @@
         <span id="btnText" style="opacity:0.8;"></span>
       </div>
 
-      <div class="search-row">
-        <input type="text" id="searchRE" placeholder="Search Bar Right">
-        <input type="text" id="searchLE" placeholder="Search Bar Left (Use if needed)">
-      </div>
     </div>
 
     <div class="results" id="results"></div>
@@ -606,6 +607,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 </body>
 </html>
+
 
 
 
