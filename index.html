@@ -197,11 +197,15 @@
       </div>
     </div>
 
+	  
     <div class="section" style="display:block;">
       <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
         <span>Search by Prescription, type SPH or CYL, type this format: <b>S-5.00 C-1.25 x180</b></span>
 	</div>
 	<div style="height:10px"></div>
+		<button id="promoBtn" disabled>Show Promo Only</button>
+	<div style="height:10px"></div>
+
       <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
       <button id="showBtn" disabled>Loading...</button>
         <span id="btnText" style="opacity:0.8;"></span>
@@ -296,10 +300,15 @@ fetch(csvUrl, { cache: 'no-store' })
       return obj;
     });
     csvLoaded = true;
-    if (showBtn) {
-      showBtn.disabled = false;
-      showBtn.textContent = 'Show Results';
-    }
+if (showBtn) {
+  showBtn.disabled = false;
+  showBtn.textContent = 'Show Results';
+}
+if (promoBtn) {
+  promoBtn.disabled = false;
+  promoBtn.textContent = 'Show Promo Only';
+}
+	  
     if (btnText) btnText.textContent = '';
   })
   .catch(err => {
@@ -397,6 +406,17 @@ function showResults(){
 // Button
 if (showBtn) showBtn.addEventListener("click", showResults);
 
+// Promo Filter button
+const promoBtn = document.getElementById("promoBtn");
+if (promoBtn) {
+  promoBtn.addEventListener("click", () => {
+    if (!csvLoaded) return;
+    const promoList = products.filter(p => (p["PROMO"] || "").trim().length > 0);
+    renderCards(promoList);
+  });
+}
+
+	
 // ---------- Numeric parsers for sorting ----------
 function getNumericPrice(p){
   // Parses first number in "1 BOX PRICE & UNIT" (e.g., "RM 120 / 30 lenses")
@@ -586,6 +606,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 </body>
 </html>
+
 
 
 
