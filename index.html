@@ -26,6 +26,7 @@
 }
 
 
+
   /* ========= Base ========= */
   body {
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
@@ -46,7 +47,7 @@
   .section {
     background: #ffffe0;
     border: 1px solid #d7d7cf;
-    border-radius: 6px;
+    border-radius: 10px;
     padding: 8px;
     margin: 8px 0;
   }
@@ -54,7 +55,7 @@
 .lens-card{
   padding:12px;
   border:1px solid #d7d7cf;
-  border-radius:12px;
+  border-radius:10px;
   background:#ffffe0;
   box-shadow:0 1px 0 rgba(0,0,0,.04);
   transition: box-shadow .15s ease, transform .15s ease;
@@ -97,7 +98,7 @@
   #results a:hover { color: #095c42; text-decoration: underline; }
 
   /* Buttons */
-  button { background: #0b3d2e; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+  button { background: #0b3d2e; color: white; border: none; padding: 6px 12px; border-radius: 10px; cursor: pointer; }
   button:disabled { background: #999; cursor: not-allowed; }
   button:hover:not(:disabled) { background: #095c42; }
 
@@ -199,13 +200,12 @@
 
 	  
     <div class="section" style="display:block;">
-      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-        <h2>7. Search by Prescription, type this format: <b>S-5.00 C-1.25 x180</b></h2>
+      <div style="display:flex; align-items:center; flex-wrap:wrap;">
+        <h2>7. If search by Prescription; type this format: S-5.00 C-1.25 x180</h2></div>
       <div class="search-row">
         <input type="text" id="searchRE" placeholder="Search Bar Right">
         <input type="text" id="searchLE" placeholder="Search Bar Left (Use if needed)">
       </div>		  
-	</div>
 	</div>
 	  
     <div class="section" style="display:block;">
@@ -219,7 +219,7 @@
       </div>
 
     </div>
-
+</div>
     <div class="results" id="results"></div>
     <div style="height:400px;"></div> <!-- Spacer -->
   </div>
@@ -460,13 +460,13 @@ function renderCards(data){
   container.innerHTML = `
     <div class="pane" style="margin:8px 0; padding:8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
       <b>Sort:</b>
-      <select id="sortSelect" style="padding:4px; font-size:12px;">
-        <option value="name-asc">Product A→Z</option>
-        <option value="name-desc">Product Z→A</option>
-        <option value="price-asc">Price Low→High</option>
-        <option value="price-desc">Price High→Low</option>
-        <option value="valuepair-asc">Value/Pair Low→High</option>
-        <option value="valuepair-desc">Value/Pair High→Low</option>
+      <select id="sortSelect" style="padding:4px; font-size:12px; border-radius:10px">
+        <option value="name-asc">Product A → Z</option>
+        <option value="name-desc">Product Z → A</option>
+        <option value="price-asc">Price Low → High</option>
+        <option value="price-desc">Price High → Low</option>
+        <option value="valuepair-asc">Value/Pair Low → High</option>
+        <option value="valuepair-desc">Value/Pair High → Low</option>
       </select>
     </div>
     <div id="cardsGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:10px;"></div>
@@ -525,7 +525,7 @@ function buildCards(list){
           position:absolute; top:6px; left:6px;
           background:#d60000; color:white;
           padding:2px 6px; font-size:10px;
-          border-radius:6px; font-weight:700;
+          border-radius:10px; font-weight:700;
           box-shadow:0 1px 3px rgba(0,0,0,.3);
         ">🔥 ${promo}</div>` : ""}
 
@@ -535,12 +535,12 @@ function buildCards(list){
               hasPhoto
               ? `<img src="${photoURL}" alt="${name}"
                    style="width:${IMG_W}px; max-width:100%; height:auto;
-                   border:1px solid #ccc; border-radius:6px; cursor:zoom-in;"
+                   border:1px solid #ccc; border-radius:10px; cursor:zoom-in;"
                    onclick="window.__openZoom && window.__openZoom('${photoURL}','${name.replace(/'/g,"\\'")}')"
                    onerror="this.style.display='none'">`
               : `<div style="width:${IMG_W}px; height:${Math.round(IMG_W*2/3)}px;
                    display:flex; align-items:center; justify-content:center;
-                   color:#666; border:1px dashed #ccc; border-radius:6px;">No photo</div>`
+                   color:#666; border:1px dashed #ccc; border-radius:10px;">No photo</div>`
             }
           </div>
 
@@ -609,6 +609,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 </body>
 </html>
+
 
 
 
