@@ -142,7 +142,7 @@
 
     <!-- Q1: Clear or Colour -->
     <div class="section">
-      <h2>1. Clear or coloured lenses?</h2>
+      <h2>Clear or coloured lenses?</h2>
       <div class="options">
         <label><input type="checkbox" name="q1" value="CLEAR">Clear</label>
         <label><input type="checkbox" name="q1" value="COLOUR">Colour</label>
@@ -151,7 +151,7 @@
 
     <!-- Q2: Modality -->
     <div class="section">
-      <h2>2. What type of disposable?</h2>
+      <h2>What type of disposable?</h2>
       <div class="options">
         <label><input type="checkbox" name="q2" value="1 DAY">1 Day</label>
         <label><input type="checkbox" name="q2" value="2 WEEKS">2 Weeks</label>
@@ -162,7 +162,7 @@
 
     <!-- Q3: Vision -->
     <div class="section">
-      <h2>3. What type of prescription (RX)?</h2>
+      <h2>What type of prescription (RX)?</h2>
 
       <div class="options">
         <label><input type="checkbox" name="q3" value="SPH">Short or Far Sighted (SPH)</label>
@@ -172,7 +172,7 @@
     </div>
 
     <!-- Q4: Material -->
-    <div class="section">
+    <div class="section" style="display:none">
       <h2>4. What type of oxygen level? (High Oxygen keeps eyes healthy if wear long hours)</h2>
       <div class="options">
         <label><input type="checkbox" name="q4" value="SIHY">High Oxygen Lenses (SiHy)</label>
@@ -181,7 +181,7 @@
     </div>
 
     <!-- Q5: Standard / Premium -->
-    <div class="section">
+    <div class="section" style="display:none">
       <h2>5. Do you need lenses with advanced technology?</h2>
       <div class="options">
         <label><input type="checkbox" name="q5" value="PREMIUM">Extra Comfort & Performance</label>
@@ -191,17 +191,73 @@
 
     <!-- Q6: Loose or Not Loose -->
     <div class="section">
-      <h2>6. Types of Packing?</h2>
+      <h2>Types of Packing?</h2>
       <div class="options">
         <label><input type="checkbox" name="q6" value="LOOSE">Travel Packs</label>
         <label><input type="checkbox" name="q6" value="NOT_LOOSE">Boxes</label>
       </div>
     </div>
 
-	  
+
+
+
+
+
+
+
+<div class="section" id="specToCL">
+  <h2>Spectacle → Contact Lens Power Converter</h2>
+
+  <!-- Input Row -->
+  <div style="display:flex; align-items:flex-end; flex-wrap:wrap; gap:10px;">
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <b>Right (OD)</b>
+      Sph <input id="sph-re" type="number" step="0.25" style="width:70px;text-align:center">
+      Cyl <input id="cyl-re" type="number" step="0.25" style="width:70px;text-align:center">
+      Axis <input id="axis-re" type="number" min="0" max="180" step="1" style="width:70px;text-align:center">
+    </div>
+
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+      <b>Left (OS)</b>
+      Sph <input id="sph-le" type="number" step="0.25" style="width:70px;text-align:center">
+      Cyl <input id="cyl-le" type="number" step="0.25" style="width:70px;text-align:center">
+      Axis <input id="axis-le" type="number" min="0" max="180" step="1" style="width:70px;text-align:center">
+    </div>
+
+    <button id="convertBtn">Convert</button>
+  </div>
+
+  <!-- Results + Auto-fill Panel -->
+  <div style="display:flex; gap:15px; margin-top:12px; align-items:flex-start; flex-wrap:wrap;">
+    <div id="clOut" class="lens-card"
+         style="flex:1; display:grid; grid-template-columns:1fr 1fr; gap:10px;
+                background:#fffff0; border:1px solid #ccc; border-radius:10px; padding:12px;">
+      <div>
+        <div style="font-weight:700;margin-bottom:6px;">RE Results</div>
+        <div id="reResult"></div>
+      </div>
+      <div>
+        <div style="font-weight:700;margin-bottom:6px;">LE Results</div>
+        <div id="leResult"></div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <button id="auto1">Auto-fill 1</button>
+      <button id="auto2">Auto-fill 2</button>
+      <button id="auto3">Auto-fill 3</button>
+      <button id="autoSE">Auto-fill SE</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+     <!-- Q7: Search --> 
     <div class="section" style="display:block;">
       <div style="display:flex; align-items:center; flex-wrap:wrap;">
-        <h2>7. If search by Prescription; type this format: S-5.00 C-1.25 x180</h2></div>
+        <h2>Search by Prescription; type this format: S-5.00 C-1.25 x180</h2></div>
       <div class="search-row">
         <input type="text" id="searchRE" placeholder="Search Bar Right">
         <input type="text" id="searchLE" placeholder="Search Bar Left (Use if needed)">
@@ -393,6 +449,8 @@ function showResults(){
   // Overlap BOTH eyes
   const setLE = new Set(leFiltered.map(p => p["FULL NAME"]));
   const overlapping = reFiltered.filter(p => setLE.has(p["FULL NAME"]));
+
+
 
   renderCards(overlapping);
 }
@@ -605,6 +663,147 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="hint">Click outside or press Esc to close</div>
   </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+(function(){
+  const CL_CYL_STEPS = [-0.75,-1.25,-1.75,-2.25,-2.75];
+  let latest = { re:null, le:null };
+
+  function glassesToCL(F){ const d=0.01; return F/(1 - d*F); }
+  function r025(x){ return Math.round(x/0.25)*0.25; }
+  function fmt(x){ x=parseFloat(x)||0; const v=Math.round(x*100)/100; const s=v>=0?"+":""; return s+v.toFixed(2); }
+  function nearest(arr,val){ return arr.reduce((b,v)=>Math.abs(v-val)<Math.abs(b-val)?v:b,arr[0]); }
+  function roundDown025(x){ return Math.floor(x/0.25)*0.25; }
+
+  // Auto-normalize input
+  document.querySelectorAll("#specToCL input[type=number]").forEach(inp=>{
+    inp.addEventListener("blur",()=>{
+      let v=parseFloat(inp.value);
+      if(isNaN(v)){inp.value="";return;}
+      if(inp.id.includes("axis")){
+        v=Math.round(v); if(v<=0)v=180; if(v>180)v=v%180||180;
+        inp.value=v;
+      }else{
+        v=r025(v);
+        inp.value=(v>0?"+":"")+v.toFixed(2);
+      }
+    });
+  });
+
+  function flatterAxis(a){
+    // decide base 10° step and flatten logic
+    const rem = Math.round(a/10)*10;
+    let t1,t2;
+    if(a<90){ t1=Math.max(0,rem-10); t2=rem+10; }
+    else if(a>90){ t1=Math.min(180,rem+10); t2=rem-10; }
+    else { t1=90; t2=100; }
+    if(t1===0) t1=180; // never show 0
+    if(t2<=0) t2+=180;
+    return [t1,t2];
+  }
+
+  function convertOne(S,C,A){
+    S=parseFloat(S)||0; C=parseFloat(C)||0; A=parseFloat(A)||0;
+    const total=S+C;
+    const convS=glassesToCL(S);
+    const convT=glassesToCL(total);
+    const newC=convT-convS;
+    const SE=convS+newC/2;
+    const rS=r025(convS);
+    const rC=nearest(CL_CYL_STEPS,newC);
+    const [axis1,axis2]=flatterAxis(A);
+
+    if(Math.abs(newC)<0.75){
+      return { type:"sph", sph:r025(SE), cyl:0, axis:null, SE:roundDown025(SE) };
+    }
+
+    // Toric 1/2/3
+    const t1={S:rS,C:rC,A:axis1};
+    const t2={S:rS,C:rC,A:axis2};
+    let t3C=rC+0.5; if(t3C>-0.75)t3C=0;
+    const t3={S:rS-0.25,C:t3C,A:axis1};
+    const se=roundDown025(SE);
+
+    return { type:"toric", t1,t2,t3,SE:se };
+  }
+
+  function display(side,data){
+    const div=document.getElementById(side==="re"?"reResult":"leResult");
+    if(!div)return;
+
+if(data.type==="sph"){
+div.innerHTML=`${side.toUpperCase()} Spherical : S${fmt(data.sph)}`;
+return; // stop here; don't append SE again
+
+}
+
+else{
+      const t=(t,n)=>`${side.toUpperCase()} Toric ${n} : S${fmt(t.S)} C${fmt(t.C)} ×${t.A}`;
+const se=`${side.toUpperCase()} Spherical : S${fmt(data.SE)}`;
+div.innerHTML=[t(data.t1,1),t(data.t2,2),t(data.t3,3),se].join("<br>");
+
+    }
+  }
+
+  document.getElementById("convertBtn").addEventListener("click",()=>{
+    const re=convertOne(
+      document.getElementById("sph-re").value,
+      document.getElementById("cyl-re").value,
+      document.getElementById("axis-re").value
+    );
+    const le=convertOne(
+      document.getElementById("sph-le").value,
+      document.getElementById("cyl-le").value,
+      document.getElementById("axis-le").value
+    );
+    display("re",re); display("le",le);
+    latest.re=re; latest.le=le;
+  });
+
+  function autofillSet(set){
+    const reBox=document.getElementById("searchRE");
+    const leBox=document.getElementById("searchLE");
+    if(!reBox||!leBox)return;
+    const f=(d)=>{
+      if(!d)return"";
+if(d.type==="sph") return `S${fmt(d.sph)} C-0.00`;
+      const sel=d[set];
+      if(!sel) return `S${fmt(d.SE)}`;
+      return `S${fmt(sel.S)} C${fmt(sel.C)} x${sel.A}`;
+    };
+    reBox.value=f(latest.re);
+    leBox.value=f(latest.le);
+  }
+
+  document.getElementById("auto1").addEventListener("click",()=>autofillSet("t1"));
+  document.getElementById("auto2").addEventListener("click",()=>autofillSet("t2"));
+  document.getElementById("auto3").addEventListener("click",()=>autofillSet("t3"));
+  document.getElementById("autoSE").addEventListener("click",()=>autofillSet("SE"));
+})();
+</script>
+
+
+
+
+
+
+
+
 
 
 </body>
