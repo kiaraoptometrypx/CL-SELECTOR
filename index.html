@@ -5,7 +5,7 @@
 <title>Contact Lens Selector</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-/* === Lightbox zoom === */
+/* === Lightbox (shared) === */
 #imgZoom {
   position: fixed; inset: 0; display: none;
   background: rgba(0,0,0,.75);
@@ -13,44 +13,47 @@
   z-index: 10000; cursor: zoom-out;
 }
 #imgZoom.open { display: flex; }
-#imgZoom img {
-  max-width: 92vw; max-height: 92vh; object-fit: contain;
-  box-shadow: 0 10px 24px rgba(0,0,0,.35); border-radius: 10px;
-  cursor: default;
-  transition: transform .15s ease;
-}
 #imgZoom .inner { position: relative; }
 #imgZoom .hint {
   position: absolute; right: 8px; bottom: -22px; color: #eee; font-size: 11px;
   user-select: none;
 }
+/* Card-mode content inside lightbox */
+#zoomCardBox{
+  display:none;
+  max-width: 920px;
+  width: 92vw;
+  background: #ffffe0;
+  border: 1px solid #d7d7cf;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.35);
+}
 
+/* ========= Base ========= */
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-size: 12px;
+  line-height: 1.3;
+  margin: 0;
+  background: #f8f8f5;
+  color: #0b3d2e;
+}
+h1 { font-size: 14px; text-align: center; margin: 10px 0 12px; }
+h2 { font-size: 13px; margin: 6px 0 8px; }
 
+/* ========= Layout ========= */
+.container { max-width: 1100px; margin: 0 auto; padding: 10px; }
+.wrap { width: 100%; min-width: 300px; }
 
-  /* ========= Base ========= */
-  body {
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-    font-size: 12px;
-    line-height: 1.3;
-    margin: 0;
-    background: #f8f8f5;
-    color: #0b3d2e;
-  }
-  h1 { font-size: 14px; text-align: center; margin: 10px 0 12px; }
-  h2 { font-size: 13px; margin: 6px 0 8px; }
-
-  /* ========= Layout ========= */
-  .container { max-width: 1100px; margin: 0 auto; padding: 10px; }
-  .wrap { width: 100%; min-width: 300px; }
-
-  /* ========= Sections ========= */
-  .section {
-    background: #ffffe0;
-    border: 1px solid #d7d7cf;
-    border-radius: 10px;
-    padding: 8px;
-    margin: 8px 0;
-  }
+/* ========= Sections ========= */
+.section {
+  background: #ffffe0;
+  border: 1px solid #d7d7cf;
+  border-radius: 10px;
+  padding: 8px;
+  margin: 8px 0;
+}
 
 .lens-card{
   padding:12px;
@@ -59,75 +62,118 @@
   background:#ffffe0;
   box-shadow:0 1px 0 rgba(0,0,0,.04);
   transition: box-shadow .15s ease, transform .15s ease;
+  cursor: pointer;
 }
 .lens-card:hover{
   box-shadow:0 4px 10px rgba(0,0,0,.06);
   transform: translateY(-1px);
 }
 
-  .options {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 6px 12px;
-  }
-  label { display: block; }
-  input[type="checkbox"] { margin-right: 4px; }
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 6px 12px;
+}
+label { display: block; }
+input[type="checkbox"] { margin-right: 4px; }
 
-  /* ========= Results ========= */
-  .results { margin-top: 12px; }
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
-  th, td {
-    border: 1px solid #ccc;
-    padding: 6px 8px;
-    text-align: left;
-    min-width: 70px;
-    white-space: normal;
-    word-wrap: break-word;
-    vertical-align: top;
-  }
-  th { background: #e6e6d6; cursor: pointer; user-select: none; }
-  th.sort-asc::after { content: " ▲"; font-size: 10px; }
-  th.sort-desc::after { content: " ▼"; font-size: 10px; }
+/* ========= Results ========= */
+.results { margin-top: 12px; }
+#sortBar { margin:8px 0; padding:8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+#cardsGrid {
+  display:grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr)); /* 4 columns */
+  gap:10px;
+}
 
-  /* Product links (inside table) */
-  #results a {
-    color: #0b3d2e;
-    text-decoration: none;
-    font-weight: 400;
-  }
-  #results a:hover { color: #095c42; text-decoration: underline; }
+/* Compact card inner layout */
+.card-compact{
+  display:flex; flex-direction:column; gap:6px;
+}
+.card-compact .photo img{
+  width:180px; max-width:100%; height:auto;
+  border:1px solid #ccc; border-radius:10px;
+  cursor: default; /* no image zoom in grid */
+}
 
-  /* Buttons */
-  button { background: #0b3d2e; color: white; border: none; padding: 6px 12px; border-radius: 10px; cursor: pointer; }
-  button:disabled { background: #999; cursor: not-allowed; }
-  button:hover:not(:disabled) { background: #095c42; }
+/* Expanded layout INSIDE LIGHTBOX */
+.zoom-card-flex{
+  display:flex;
+  flex-direction: column;      /* was row */
+  gap:12px;
+  align-items:center;          /* center the big photo */
+  flex-wrap:nowrap;            /* no wrapping when vertical */
+}
+.zoom-card-flex .photo img{
+  width:500px; max-width:100%; height:auto;
+  border:1px solid #ccc; border-radius:10px;
+  cursor: default; /* no image zoom in lightbox */
+}
+.zoom-card-flex .details{
+  flex:1; min-width:220px; display:flex; flex-direction:column; gap:8px;
+}
 
-  /* Search bars row */
-  .search-row { display: flex; gap: 4%; margin: 12px 0; }
-  .search-row input { flex: 1; padding: 6px; font-size: 12px; }
+/* Promo ribbon */
+.promo-badge{
+  position:absolute; top:6px; left:6px;
+  background:#d60000; color:white;
+  padding:2px 6px; font-size:10px;
+  border-radius:10px; font-weight:700;
+  box-shadow:0 1px 3px rgba(0,0,0,.3);
+}
 
-  /* 🔒 Overlay for blackout */
-  #overlay {
-    position: fixed; inset: 0;
-    background: #EDEADF;
-    color: black;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem;
-    z-index: 9999;
-  }
+/* Buttons */
+button { background: #0b3d2e; color: white; border: none; padding: 6px 12px; border-radius: 10px; cursor: pointer; }
+button:disabled { background: #999; cursor: not-allowed; }
+button:hover:not(:disabled) { background: #095c42; }
 
-  /* Make all checkboxes green */
-  input[type="checkbox"] { accent-color: #0b3d2e; }
-  input[type="checkbox"]:hover { filter: brightness(1.1); }
-  input[type="checkbox"]:focus {
-    outline: 2px solid #0b3d2e33;
-    outline-offset: 2px;
-  }
+/* Search bars row */
+.search-row { display: flex; gap: 4%; margin: 12px 0; }
+.search-row input { flex: 1; padding: 6px; font-size: 12px; }
 
-  @media (max-width: 600px) {
-    .container { padding: 8px; }
-    .search-row { flex-direction: column; gap: 8px; }
-  }
+/* 🔒 Overlay for blackout */
+#overlay {
+  position: fixed; inset: 0;
+  background: #EDEADF;
+  color: black;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  z-index: 9999;
+}
+
+/* Checkboxes */
+input[type="checkbox"] { accent-color: #0b3d2e; }
+input[type="checkbox"]:hover { filter: brightness(1.1); }
+input[type="checkbox"]:focus {
+  outline: 2px solid #0b3d2e33;
+  outline-offset: 2px;
+}
+
+/* Pro mode */
+.simple-hide { display: none !important; }
+
+/* Tooltip bubble (tap) */
+.tip-bubble{
+  position: fixed;
+  z-index: 10001;
+  max-width: 240px;
+  background:#0b3d2e; color:#fff;
+  padding:8px 10px; border-radius:10px;
+  box-shadow:0 4px 16px rgba(0,0,0,.25);
+  font-size:12px; line-height:1.3;
+}
+
+/* RX icons row */
+.rx-icons { display:flex; gap:10px; align-items:center; margin-top:8px; }
+.rx-icons img { height:32px; width:auto; border:1px solid #ccc; border-radius:6px; padding:2px; background:#fff; }
+
+/* Responsive */
+@media (max-width: 900px){
+  #cardsGrid{ grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+}
+@media (max-width: 550px){
+  #cardsGrid{ grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -138,10 +184,10 @@
 <!-- Main content (hidden until password ok) -->
 <div class="container" id="content" style="display:none;">
   <div class="wrap">
-    <h1>Contact Lens Selector</h1>
+    <h1>Kiara Optometry Contact Lens Selector</h1>
 
     <!-- Q1: Clear or Colour -->
-    <div class="section">
+    <div class="section" id="q1">
       <h2>Clear or coloured lenses?</h2>
       <div class="options">
         <label><input type="checkbox" name="q1" value="CLEAR">Clear</label>
@@ -150,7 +196,7 @@
     </div>
 
     <!-- Q2: Modality -->
-    <div class="section">
+    <div class="section" id="q2">
       <h2>What type of disposable?</h2>
       <div class="options">
         <label><input type="checkbox" name="q2" value="1 DAY">1 Day</label>
@@ -160,37 +206,26 @@
       </div>
     </div>
 
-    <!-- Q3: Vision -->
-    <div class="section">
+    <!-- Q3: Vision (+ RX icons toggle) -->
+    <div class="section" id="q3">
       <h2>What type of prescription (RX)?</h2>
-
       <div class="options">
         <label><input type="checkbox" name="q3" value="SPH">Short or Far Sighted (SPH)</label>
         <label><input type="checkbox" name="q3" value="ASTIG">With Astigmatism (ASTIG)</label>
         <label><input type="checkbox" name="q3" value="MF">Multi-focal (MF)</label>
       </div>
-    </div>
-
-    <!-- Q4: Material -->
-    <div class="section" style="display:none">
-      <h2>4. What type of oxygen level? (High Oxygen keeps eyes healthy if wear long hours)</h2>
-      <div class="options">
-        <label><input type="checkbox" name="q4" value="SIHY">High Oxygen Lenses (SiHy)</label>
-        <label><input type="checkbox" name="q4" value="HY">Standard Oxygen (Hy)</label>
+      <div style="margin-top:8px;">
+        <button id="rxToggleBtn">Show / Hide</button>
+      </div>
+      <div id="rxIcons" class="rx-icons" style="display:none;">
+        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/RX-IMAGES/SPH.png" alt="SPH">
+        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/RX-IMAGES/ASTIG.png" alt="ASTIG">
+        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/RX-IMAGES/MF.png" alt="MF">
       </div>
     </div>
 
-    <!-- Q5: Standard / Premium -->
-    <div class="section" style="display:none">
-      <h2>5. Do you need lenses with advanced technology?</h2>
-      <div class="options">
-        <label><input type="checkbox" name="q5" value="PREMIUM">Extra Comfort & Performance</label>
-        <label><input type="checkbox" name="q5" value="STANDARD">Standard Comfort Design</label>
-      </div>
-    </div>
-
-    <!-- Q6: Loose or Not Loose -->
-    <div class="section">
+    <!-- Q6: Packing -->
+    <div class="section" id="q6">
       <h2>Types of Packing?</h2>
       <div class="options">
         <label><input type="checkbox" name="q6" value="LOOSE">Travel Packs</label>
@@ -198,85 +233,120 @@
       </div>
     </div>
 
-
-
-
-
-
-
-
-<div class="section" id="specToCL">
-  <h2>Spectacle → Contact Lens Power Converter</h2>
-
-  <!-- Input Row -->
-  <div style="display:flex; align-items:flex-end; flex-wrap:wrap; gap:10px;">
-    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-      <b>Right (OD)</b>
-      Sph <input id="sph-re" type="number" step="0.25" style="width:70px;text-align:center">
-      Cyl <input id="cyl-re" type="number" step="0.25" style="width:70px;text-align:center">
-      Axis <input id="axis-re" type="number" min="0" max="180" step="1" style="width:70px;text-align:center">
+    <div style="height:10px"></div>
+    <div style="text-align:center; margin-bottom:10px;">
+      <button id="modeToggleBtn" style="font-size:12px">Switch to Professional Mode</button>
     </div>
+    <div style="height:10px"></div>
 
-    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-      <b>Left (OS)</b>
-      Sph <input id="sph-le" type="number" step="0.25" style="width:70px;text-align:center">
-      Cyl <input id="cyl-le" type="number" step="0.25" style="width:70px;text-align:center">
-      Axis <input id="axis-le" type="number" min="0" max="180" step="1" style="width:70px;text-align:center">
-    </div>
-
-    <button id="convertBtn">Convert</button>
-  </div>
-
-  <!-- Results + Auto-fill Panel -->
-  <div style="display:flex; gap:15px; margin-top:12px; align-items:flex-start; flex-wrap:wrap;">
-    <div id="clOut" class="lens-card"
-         style="flex:1; display:grid; grid-template-columns:1fr 1fr; gap:10px;
-                background:#fffff0; border:1px solid #ccc; border-radius:10px; padding:12px;">
-      <div>
-        <div style="font-weight:700;margin-bottom:6px;">RE Results</div>
-        <div id="reResult"></div>
-      </div>
-      <div>
-        <div style="font-weight:700;margin-bottom:6px;">LE Results</div>
-        <div id="leResult"></div>
+    <!-- Q4: Comfort -->
+    <div class="section" id="q4">
+      <h2>Comfort level?</h2>
+      <div class="options">
+        <label><input type="checkbox" name="q4" value="BASIC">Basic</label>
+        <label><input type="checkbox" name="q4" value="GOOD">Good</label>
+        <label><input type="checkbox" name="q4" value="PREMIUM">Premium</label>
       </div>
     </div>
 
-    <div style="display:flex; flex-direction:column; gap:8px;">
-      <button id="auto1">Auto-fill 1</button>
-      <button id="auto2">Auto-fill 2</button>
-      <button id="auto3">Auto-fill 3</button>
-      <button id="autoSE">Auto-fill SE</button>
+    <!-- Q5: Material -->
+    <div class="section" id="q5">
+      <h2>Material type?</h2>
+      <div class="options">
+        <label><input type="checkbox" name="q5" value="HYDROGEL">Hydrogel (Standard Oxygen)</label>
+        <label><input type="checkbox" name="q5" value="SILICONE HYDROGEL">Silicone Hydrogel (High Oxygen)</label>
+      </div>
     </div>
-  </div>
-</div>
 
+    <!-- Converter (Pro mode can hide/show) -->
+    <div class="section" id="specToCL">
+      <h2>Spectacle → Contact Lens Power Converter</h2>
 
+      <!-- Input Row -->
+      <div style="display:flex; align-items:flex-end; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <b>RE Specs :</b>
+          Sph <input id="sph-re" type="number" step="0.25" style="width:70px;text-align:center">
+          Cyl <input id="cyl-re" type="number" step="0.25" style="width:70px;text-align:center">
+          Axis <input id="axis-re" type="number" min="0" max="180" step="1" style="width:70px;text-align:center">
+        </div>
 
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <b>LE Specs :</b>
+          Sph <input id="sph-le" type="number" step="0.25" style="width:70px;text-align:center">
+          Cyl <input id="cyl-le" type="number" step="0.25" style="width:70px;text-align:center">
+          Axis <input id="axis-le" type="number" min="0" max="180" step="1" style="width:70px;text-align:center">
+        </div>
 
-     <!-- Q7: Search --> 
-    <div class="section" style="display:block;">
-      <div style="display:flex; align-items:center; flex-wrap:wrap;">
-        <h2>Search by Prescription; type this format: S-5.00 C-1.25 x180</h2></div>
+        <button id="convertBtn">Convert</button>
+      </div>
+
+      <!-- Results + Auto-fill Panel -->
+      <div style="display:flex; gap:15px; margin-top:12px; align-items:flex-start; flex-wrap:wrap;">
+        <div id="clOut" class="lens-card"
+            style="flex:1; display:grid; grid-template-columns:1fr 1fr; gap:10px;
+                    background:#fffff0; border:1px solid #ccc; border-radius:10px; padding:12px;">
+          <div>
+            <div style="font-weight:700;margin-bottom:6px;">RE Results</div>
+            <div id="reResult"></div>
+          </div>
+          <div>
+            <div style="font-weight:700;margin-bottom:6px;">LE Results</div>
+            <div id="leResult"></div>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <button id="auto1">Auto-fill 1</button>
+          <button id="auto2">Auto-fill 2</button>
+          <button id="auto3">Auto-fill 3</button>
+          <button id="autoSE">Auto-fill SE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="section" id="searchSec">
+      <div style="display:flex; gap:15px; margin-top:12px; align-items:flex-start; flex-wrap:wrap;">
+        <span><b>Search Manually: *Hint*</b> Search Toric RX by typing in this format: S-5.00 C-1.25 x180</span>
+      </div>
       <div class="search-row">
         <input type="text" id="searchRE" placeholder="Search Bar Right">
         <input type="text" id="searchLE" placeholder="Search Bar Left (Use if needed)">
-      </div>		  
-	</div>
-	  
-    <div class="section" style="display:block;">
-    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-		<button id="promoBtn" disabled>Show Promo Only</button>
-	<div style="height:10px"></div>
-
-      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-      <button id="showBtn" disabled>Loading...</button>
-        <span id="btnText" style="opacity:0.8;"></span>
       </div>
-
     </div>
-</div>
-    <div class="results" id="results"></div>
+
+    <!-- Action buttons -->
+    <div class="section" id="actionsSec">
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <button id="promoBtn" disabled>Show Promo Only</button>
+        <div style="height:10px"></div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <button id="showBtn" disabled>Loading...</button>
+          <span id="btnText" style="opacity:0.8;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sort bar + Results -->
+    <div id="sortBar" class="pane section" style="display:none;">
+      <b>Sort:</b>
+      <select id="sortSelect" style="padding:4px; font-size:12px; border-radius:10px">
+        <option value="name-asc">Product A → Z</option>
+        <option value="name-desc">Product Z → A</option>
+        <option value="price-asc">Price Low → High</option>
+        <option value="price-desc">Price High → Low</option>
+        <option value="valuepair-asc">Value/Pair Low → High</option>
+        <option value="valuepair-desc">Value/Pair High → Low</option>
+        <option value="comfort-desc">Comfort High → Low</option>
+        <option value="comfort-asc">Comfort Low → High</option>
+      </select>
+    </div>
+
+    <div class="results" id="results">
+      <div id="cardsGrid"></div>
+    </div>
+
     <div style="height:400px;"></div> <!-- Spacer -->
   </div>
 </div>
@@ -310,30 +380,30 @@
 })();
 </script>
 
-
-
-
-
-
-
-
-
-
 <script>
 /* =========================
-   Contact Lens Selector – Cards + VALUE_PER_PAIR
-   (Drop-in JS replacement, no <script> wrappers)
+   Contact Lens Selector – CSV / Filters / Results
 ========================= */
-
 const csvUrl = 'https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL%20DATABASE.csv';
 
 let products = [];
 let csvLoaded = false;
 
-const showBtn = document.getElementById('showBtn');
-const btnText = document.getElementById('btnText');
+const showBtn  = document.getElementById('showBtn');
+const promoBtn = document.getElementById('promoBtn');
+const btnText  = document.getElementById('btnText');
+const sortBar  = document.getElementById('sortBar');
+const sortSelect = document.getElementById('sortSelect');
 
-// ---------- CSV parsing (robust to quoted commas) ----------
+const rxToggleBtn = document.getElementById('rxToggleBtn');
+const rxIcons = document.getElementById('rxIcons');
+
+/* ---- RX images toggle ---- */
+rxToggleBtn.addEventListener('click', ()=>{
+  rxIcons.style.display = (rxIcons.style.display === 'none' || rxIcons.style.display === '') ? 'flex' : 'none';
+});
+
+/* ---- CSV parsing ---- */
 function parseCSV(text){
   const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter(l => l.trim() !== '');
   if (lines.length < 2) return { headers: [], rows: [] };
@@ -348,7 +418,7 @@ function parseCSV(text){
   return { headers, rows };
 }
 
-// ---------- Load CSV ----------
+/* ---- Load CSV ---- */
 fetch(csvUrl, { cache: 'no-store' })
   .then(res => { if (!res.ok) throw new Error("HTTP "+res.status); return res.text(); })
   .then(text => {
@@ -359,27 +429,17 @@ fetch(csvUrl, { cache: 'no-store' })
       return obj;
     });
     csvLoaded = true;
-if (showBtn) {
-  showBtn.disabled = false;
-  showBtn.textContent = 'Show Results';
-}
-if (promoBtn) {
-  promoBtn.disabled = false;
-  promoBtn.textContent = 'Show Promo Only';
-}
-	  
-    if (btnText) btnText.textContent = '';
+    if (showBtn)  { showBtn.disabled = false; showBtn.textContent = 'Show Results'; }
+    if (promoBtn) { promoBtn.disabled = false; promoBtn.textContent = 'Show Promo Only'; }
+    if (btnText)  btnText.textContent = '';
   })
   .catch(err => {
     console.error("CSV Load Error:", err);
-    if (showBtn) {
-      showBtn.disabled = true;
-      showBtn.textContent = 'Load failed';
-    }
+    if (showBtn) { showBtn.disabled = true; showBtn.textContent = 'Load failed'; }
     if (btnText) btnText.textContent = 'Please refresh to retry.';
   });
 
-// ---------- Collect selected filters ----------
+/* ---- Gather filters ---- */
 function getSelections(){
   const selected = { q1:[], q2:[], q3:[], q4:[], q5:[], q6:[] };
   document.querySelectorAll('input[type="checkbox"]:checked').forEach(c => {
@@ -388,13 +448,15 @@ function getSelections(){
   return selected;
 }
 
-// ---------- Core filter per eye ----------
+/* ---- Filter core ---- */
 function filterProducts(selected, query){
   const q1Col = "LENS TYPE (CLEAR, COLOUR)";
   const mCol  = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
   const vCol  = "VISION (SPH, ASTIG, MF)";
-  const matCol= "MATERIAL (SIHY, HY)";
-  const gCol  = "GRADE (PREMIUM, STANDARD)";
+
+  // Split columns in CSV:
+  const COMFORT_COL  = "COMFORT";            // BASIC / GOOD / PREMIUM
+  const MATERIAL_COL = "MATERIAL";           // HYDROGEL / SILICONE HYDROGEL
 
   const terms = (query || '').toLowerCase().split(/\s+/).filter(Boolean);
 
@@ -402,16 +464,18 @@ function filterProducts(selected, query){
     const lensType = (p[q1Col]  || '').trim().toUpperCase();
     const modality = (p[mCol]   || '').trim().toUpperCase();
     const vision   = (p[vCol]   || '').trim().toUpperCase();
-    const material = (p[matCol] || '').trim().toUpperCase();
-    const grade    = (p[gCol]   || '').trim().toUpperCase();
+
+    const comfort  = (p[COMFORT_COL]  || '').trim().toUpperCase();
+    const material = (p[MATERIAL_COL] || '').trim().toUpperCase();
 
     if (selected.q1.length && !selected.q1.includes(lensType)) return false;
     if (selected.q2.length && !selected.q2.includes(modality)) return false;
     if (selected.q3.length && !selected.q3.includes(vision))   return false;
-    if (selected.q4.length && !selected.q4.includes(material)) return false;
-    if (selected.q5.length && !selected.q5.includes(grade))    return false;
 
-    // Q6: Loose vs Not Loose — detect by FULL NAME containing the word "loose"
+    if (selected.q4.length && !selected.q4.includes(comfort))  return false;     // COMFORT
+    if (selected.q5.length && !selected.q5.includes(material)) return false;     // MATERIAL
+
+    // Q6: Loose vs Not Loose — detect by FULL NAME containing "loose"
     const fullName = p["FULL NAME"] || "";
     const isLoose = /\bloose\b/i.test(fullName);
     if (selected.q6.length) {
@@ -433,10 +497,41 @@ function filterProducts(selected, query){
   });
 }
 
-// ---------- Show Results (dual-eye overlap) ----------
+/* ---- Helpers ---- */
+function getNumericPrice(p){
+  const text = (p["1 BOX PRICE & UNIT"] || "").replace(/,/g, "");
+  const m = text.match(/(\d+(\.\d+)?)/);
+  return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
+}
+function getNumericValuePerPair(p){
+  const text = (p["VALUE_PER_PAIR"] || "").toString().replace(/,/g, "").trim();
+  if (!text) return Number.POSITIVE_INFINITY;
+  const m = text.match(/(\d+(\.\d+)?)/);
+  return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
+}
+function niceCase(s=""){
+  s = String(s).toLowerCase();
+  return s.replace(/\b\w/g, c => c.toUpperCase());
+}
+function mapMaterial(s=""){
+  const u = s.toUpperCase().trim();
+  if (u === "HYDROGEL") return "Hydrogel (Standard Oxygen)";
+  if (u === "SILICONE HYDROGEL") return "Silicone Hydrogel (High Oxygen)";
+  return niceCase(s);
+}
+function mapComfortRank(s=""){
+  const u = (s||"").toUpperCase().trim();
+  if (u === "PREMIUM") return 3;
+  if (u === "GOOD")    return 2;
+  if (u === "BASIC")   return 1;
+  return 0;
+}
+
+/* ---- Show Results pipeline ---- */
+let promoOnlyMode = false;
+
 function showResults(){
   if (!csvLoaded) return;
-
   const selected = getSelections();
 
   const reInput = (document.getElementById("searchRE")?.value || "").trim().toLowerCase();
@@ -448,14 +543,17 @@ function showResults(){
 
   // Overlap BOTH eyes
   const setLE = new Set(leFiltered.map(p => p["FULL NAME"]));
-  const overlapping = reFiltered.filter(p => setLE.has(p["FULL NAME"]));
+  let overlapping = reFiltered.filter(p => setLE.has(p["FULL NAME"]));
 
-
+  // Promo-only respects current filters
+  if (promoOnlyMode) {
+    overlapping = overlapping.filter(p => (p["PROMO"] || "").trim().length > 0);
+  }
 
   renderCards(overlapping);
 }
 
-// Enter to search
+/* ---- Enter to search ---- */
 ["searchRE","searchLE"].forEach(id => {
   const el = document.getElementById(id);
   if (!el) return;
@@ -464,45 +562,44 @@ function showResults(){
   });
 });
 
-// Button
-if (showBtn) showBtn.addEventListener("click", showResults);
+/* ---- Buttons ---- */
+showBtn?.addEventListener("click", () => { promoOnlyMode = false; showResults(); });
+promoBtn?.addEventListener("click", () => { promoOnlyMode = true; showResults(); });
 
-// Promo Filter button
-const promoBtn = document.getElementById("promoBtn");
-if (promoBtn) {
-  promoBtn.addEventListener("click", () => {
-    if (!csvLoaded) return;
-    const promoList = products.filter(p => (p["PROMO"] || "").trim().length > 0);
-    renderCards(promoList);
-  });
-}
+/* ---- Sorting ---- */
+sortSelect?.addEventListener("change", ()=>{
+  const items = [...(window._lastResults || [])];
+  const val = sortSelect.value;
 
-	
-// ---------- Numeric parsers for sorting ----------
-function getNumericPrice(p){
-  // Parses first number in "1 BOX PRICE & UNIT" (e.g., "RM 120 / 30 lenses")
-  const text = (p["1 BOX PRICE & UNIT"] || "").replace(/,/g, "");
-  const m = text.match(/(\d+(\.\d+)?)/);
-  return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
-}
+  if (val.startsWith("name")) {
+    const dir = val.endsWith("asc") ? 1 : -1;
+    items.sort((a,b) => (a["FULL NAME"]||"").localeCompare(b["FULL NAME"]||"", undefined, {sensitivity:"base"}) * dir);
+  } else if (val.startsWith("price")) {
+    const dir = val.endsWith("asc") ? 1 : -1;
+    items.sort((a,b) => (getNumericPrice(a) - getNumericPrice(b)) * dir);
+  } else if (val.startsWith("valuepair")) {
+    const dir = val.endsWith("asc") ? 1 : -1;
+    items.sort((a,b) => (getNumericValuePerPair(a) - getNumericValuePerPair(b)) * dir);
+  } else if (val === "comfort-desc") {
+    items.sort((a,b) => mapComfortRank(b["COMFORT"]) - mapComfortRank(a["COMFORT"]));
+  } else if (val === "comfort-asc") {
+    items.sort((a,b) => mapComfortRank(a["COMFORT"]) - mapComfortRank(b["COMFORT"]));
+  }
+  buildCards(items);
+});
 
-function getNumericValuePerPair(p){
-  // Accepts formats like "RM 160 / pair", "160", "RM160", "", etc.
-  const text = (p["VALUE_PER_PAIR"] || "").toString().replace(/,/g, "").trim();
-  if (!text) return Number.POSITIVE_INFINITY;
-  const m = text.match(/(\d+(\.\d+)?)/);
-  return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
-}
-
-// ---------- Render: Sort bar + Card grid ----------
+/* ---- Render Cards (compact only; click => lightbox big view) ---- */
 function renderCards(data){
-  const container = document.getElementById("results");
+  const container = document.getElementById("cardsGrid");
+  const bar = document.getElementById("sortBar");
   if (!container) return;
 
   if (!data || !data.length) {
     container.innerHTML = "<p>No matching products found.</p>";
+    bar.style.display = "none";
     return;
   }
+  bar.style.display = "flex";
 
   // De-duplicate by FULL NAME
   const seen = new Set();
@@ -514,61 +611,24 @@ function renderCards(data){
   });
 
   window._lastResults = clean;
-
-  container.innerHTML = `
-    <div class="pane" style="margin:8px 0; padding:8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-      <b>Sort:</b>
-      <select id="sortSelect" style="padding:4px; font-size:12px; border-radius:10px">
-        <option value="name-asc">Product A → Z</option>
-        <option value="name-desc">Product Z → A</option>
-        <option value="price-asc">Price Low → High</option>
-        <option value="price-desc">Price High → Low</option>
-        <option value="valuepair-asc">Value/Pair Low → High</option>
-        <option value="valuepair-desc">Value/Pair High → Low</option>
-      </select>
-    </div>
-    <div id="cardsGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:10px;"></div>
-  `;
-
   buildCards(clean);
-
-  const sortEl = document.getElementById("sortSelect");
-  if (sortEl) {
-    sortEl.addEventListener("change", e => {
-      const val = e.target.value;
-      const items = [...(window._lastResults || [])];
-
-      if (val.startsWith("name")) {
-        const dir = val.endsWith("asc") ? 1 : -1;
-        items.sort((a,b) => (a["FULL NAME"]||"").localeCompare(b["FULL NAME"]||"", undefined, {sensitivity:"base"}) * dir);
-      } else if (val.startsWith("price")) {
-        const dir = val.endsWith("asc") ? 1 : -1;
-        items.sort((a,b) => (getNumericPrice(a) - getNumericPrice(b)) * dir);
-      } else if (val.startsWith("valuepair")) {
-        const dir = val.endsWith("asc") ? 1 : -1;
-        items.sort((a,b) => (getNumericValuePerPair(a) - getNumericValuePerPair(b)) * dir);
-      }
-
-      buildCards(items);
-    });
-  }
 }
 
-// ---------- Card grid builder ----------
 function buildCards(list){
   const grid = document.getElementById("cardsGrid");
   if (!grid) return;
 
   const H_DISPOSE = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
   const H_PRICE   = "1 BOX PRICE & UNIT";
-  const H_MAT     = "COMFORT & MATERIAL";
   const H_VALUE   = "VALUE_PER_PAIR";
   const H_PROMO   = "PROMO";
-  const IMG_W = 320;
+  const H_COMFORT = "COMFORT";
+  const H_MAT     = "MATERIAL";
 
-  const html = list.map(p => {
-    const name     = p["FULL NAME"] || "";
-    const promo    = (p[H_PROMO] || "").trim();
+  const html = list.map((p, idx) => {
+    const id = "card_" + idx;
+    const name  = p["FULL NAME"] || "";
+    const promo = (p[H_PROMO] || "").trim();
     const hasPromo = promo.length > 0;
 
     const photoKey = (p["PHOTO"] || "").trim();
@@ -577,109 +637,174 @@ function buildCards(list){
       ? `https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photoKey}.png`
       : "";
 
-    return `
-      <div class="pane lens-card" style="position:relative;">
-        ${hasPromo ? `<div style="
-          position:absolute; top:6px; left:6px;
-          background:#d60000; color:white;
-          padding:2px 6px; font-size:10px;
-          border-radius:10px; font-weight:700;
-          box-shadow:0 1px 3px rgba(0,0,0,.3);
-        ">🔥 ${promo}</div>` : ""}
+    const price = p[H_PRICE] || "";
+    const value = p[H_VALUE] || "";
 
-        <div style="display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;">
-          <div style="flex:0 0 ${IMG_W}px; max-width:100%;">
-            ${
-              hasPhoto
-              ? `<img src="${photoURL}" alt="${name}"
-                   style="width:${IMG_W}px; max-width:100%; height:auto;
-                   border:1px solid #ccc; border-radius:10px; cursor:zoom-in;"
-                   onclick="window.__openZoom && window.__openZoom('${photoURL}','${name.replace(/'/g,"\\'")}')"
-                   onerror="this.style.display='none'">`
-              : `<div style="width:${IMG_W}px; height:${Math.round(IMG_W*2/3)}px;
-                   display:flex; align-items:center; justify-content:center;
-                   color:#666; border:1px dashed #ccc; border-radius:10px;">No photo</div>`
-            }
-          </div>
+return `
+  <div id="${id}" class="pane lens-card card-compact" style="position:relative;">
+    ${hasPromo ? `<div class="promo-badge">🔥 ${promo}</div>` : ""}
+    <div style="font-weight:700; margin-bottom:6px;">${name}</div>
+    <div class="photo" style="margin-bottom:6px;">
+      ${
+        hasPhoto
+        ? `<img src="${photoURL}" alt="${name}" onerror="this.style.display='none'">`
+        : `<div style="width:180px; height:120px; display:flex; align-items:center; justify-content:center; color:#666; border:1px dashed #ccc; border-radius:10px;">No photo</div>`
+      }
+    </div>
+    <div>${price}</div>
+    <div>${value || "-"}</div>
+  </div>`;
 
-          <div style="flex:1; min-width:220px; display:flex; flex-direction:column; gap:8px;">
-            <div style="font-weight:700;">${name}</div>
-            <div><b>Dispose Period:</b> ${p[H_DISPOSE] || ""}</div>
-            <div><b>Comfort & Material:</b> ${p[H_MAT] || ""}</div>
-            <div><b>Average cost per pair:</b> ${p[H_VALUE] || "-"}</div>
-			<div style="height:5px"></div>
-            <div><b>Price Per Pack & Qty:</b> ${p[H_PRICE] || ""}</div>
-            <div><b>Current Promo:</b> ${hasPromo ? promo : "Not at the moment"}</div>
-          </div>
-        </div>
-      </div>
-    `;
   }).join("");
 
   grid.innerHTML = html;
+
+  // Click card => open LIGHTBOX with BIG (500px) full details
+  list.forEach((p, idx) => {
+    const id = "card_" + idx;
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.addEventListener('click', ()=>{
+      const H_DISPOSE = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
+      const H_PRICE   = "1 BOX PRICE & UNIT";
+      const H_VALUE   = "VALUE_PER_PAIR";
+      const H_PROMO   = "PROMO";
+      const H_COMFORT = "COMFORT";
+      const H_MAT     = "MATERIAL";
+
+      const name     = p["FULL NAME"] || "";
+      const promo    = (p[H_PROMO] || "").trim();
+      const hasPromo = promo.length > 0;
+
+      const photoKey = (p["PHOTO"] || "").trim();
+      const hasPhoto = !!photoKey;
+      const photoURL = hasPhoto
+        ? `https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL-PHOTOS/${photoKey}.png`
+        : "";
+
+      const dispose  = p[H_DISPOSE] || "";
+      const price    = p[H_PRICE]   || "";
+      const value    = p[H_VALUE]   || "";
+      const comfort  = (p[H_COMFORT] || "");
+      const material = (p[H_MAT]     || "");
+
+      const comfortNice  = niceCase(comfort);
+      const materialNice = mapMaterial(material);
+
+      const expandedHTML = `
+        <div class="zoom-card-flex">
+          <div class="photo">
+            ${
+              hasPhoto
+              ? `<img src="${photoURL}" alt="${name}" onerror="this.style.display='none'">
+`
+              : `<div style="width:500px; height:333px; display:flex; align-items:center; justify-content:center; color:#666; border:1px dashed #ccc; border-radius:10px;">No photo</div>`
+            }
+          </div>
+          <div class="details">
+            <div style="font-weight:700;">${name}</div>
+            <div><b>Dispose Period:</b> ${dispose}</div>
+            <div>
+              <b>Comfort:</b> ${comfortNice}
+              <button class="info-btn" data-tip="Comfort is enhanced using more slippery coating, material softness and thinness, and improved quality of the liquid that contains the lens." style="margin-left:6px;padding:2px 6px;">ℹ️</button>
+            </div>
+            <div>
+              <b>Material:</b> ${materialNice}
+              <button class="info-btn" data-tip="Material is enhanced when silicone is embedded in. It makes the lens more breathable, allowing longer wearing hours without interruption." style="margin-left:6px;padding:2px 6px;">ℹ️</button>
+            </div>
+            <div><b>Average cost per pair:</b> ${value || "-"}</div>
+            <div style="height:5px"></div>
+            <div><b>Price Per Pack & Qty:</b> ${price}</div>
+            <div><b>Current Promo:</b> ${hasPromo ? promo : "Not at the moment"}</div>
+          </div>
+        </div>
+      `;
+
+      if (window.__openCardZoom) window.__openCardZoom(expandedHTML);
+
+      // enable tooltip inside lightbox
+      setTimeout(()=>{
+        document.querySelectorAll('#zoomCardBox .info-btn').forEach(btn=>{
+          btn.addEventListener('click', (ev)=>{
+            ev.stopPropagation();
+            const text = btn.getAttribute('data-tip') || '';
+            showTipNear(btn, text);
+          });
+        });
+      }, 0);
+    });
+  });
 }
 
+/* ---- Floating tooltip (tap) ---- */
+let activeTipEl = null;
+function showTipNear(anchor, text){
+  hideTip();
+  const rect = anchor.getBoundingClientRect();
+  const tip = document.createElement('div');
+  tip.className = 'tip-bubble';
+  tip.textContent = text;
+  document.body.appendChild(tip);
 
+  const pad = 6;
+  const top = rect.bottom + pad + window.scrollY;
+  const left = rect.left + window.scrollX;
+  tip.style.top = top + 'px';
+  tip.style.left = left + 'px';
+  activeTipEl = tip;
 
+  setTimeout(()=>{ document.addEventListener('click', onDocClickClose, { once:true }); }, 0);
+}
+function onDocClickClose(){ hideTip(); }
+function hideTip(){
+  if (activeTipEl && activeTipEl.parentNode){
+    activeTipEl.parentNode.removeChild(activeTipEl);
+  }
+  activeTipEl = null;
+}
 </script>
 
 <script>
+/* =========================
+   Lightbox: CARD MODE (photo zoom removed)
+========================= */
 document.addEventListener('DOMContentLoaded', function(){
   const overlay = document.getElementById('imgZoom');
-  const imgEl   = document.getElementById('imgZoomEl');
-  if (!overlay || !imgEl) return;
+  const cardBox = document.getElementById('zoomCardBox');
+  if (!overlay || !cardBox) return;
 
-  function openZoom(src, alt=''){
-    imgEl.src = src;
-    imgEl.alt = alt || '';
+  function openCard(html){
+    cardBox.innerHTML = html;
+    cardBox.style.display = 'block';
     overlay.classList.add('open');
-    imgEl.dataset.zoom = '1';
-    imgEl.style.transform = 'scale(1)';
   }
-  function closeZoom(){
+  function closeAll(){
     overlay.classList.remove('open');
-    imgEl.src = '';
-    imgEl.alt = '';
+    cardBox.innerHTML = '';
+    cardBox.style.display = 'none';
   }
 
-  overlay.addEventListener('click', (e)=>{ if (e.target === overlay) closeZoom(); });
-  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && overlay.classList.contains('open')) closeZoom(); });
-  imgEl.addEventListener('dblclick', ()=>{
-    const z = imgEl.dataset.zoom === '2' ? '1' : '2';
-    imgEl.dataset.zoom = z;
-    imgEl.style.transform = (z === '2') ? 'scale(2)' : 'scale(1)';
-  });
+  overlay.addEventListener('click', (e)=>{ if (e.target === overlay) closeAll(); });
+  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && overlay.classList.contains('open')) closeAll(); });
 
-  // make available to <img onclick=...>
-  window.__openZoom = openZoom;
+  window.__openCardZoom  = openCard;
+  window.__closeZoom     = closeAll;
 });
 </script>
 
-
-<!-- 🔍 Image lightbox -->
+<!-- 🔍 Lightbox root (card mode) -->
 <div id="imgZoom" aria-modal="true" role="dialog">
   <div class="inner">
-    <img id="imgZoomEl" alt="">
-    <div class="hint">Click outside or press Esc to close</div>
+    <div id="zoomCardBox"></div>
+    <div class="hint">Tap outside or press Esc to close</div>
   </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <script>
+/* =========================
+   Converter (unchanged core)
+========================= */
 (function(){
   const CL_CYL_STEPS = [-0.75,-1.25,-1.75,-2.25,-2.75];
   let latest = { re:null, le:null };
@@ -690,7 +815,6 @@ document.addEventListener('DOMContentLoaded', function(){
   function nearest(arr,val){ return arr.reduce((b,v)=>Math.abs(v-val)<Math.abs(b-val)?v:b,arr[0]); }
   function roundDown025(x){ return Math.floor(x/0.25)*0.25; }
 
-  // Auto-normalize input
   document.querySelectorAll("#specToCL input[type=number]").forEach(inp=>{
     inp.addEventListener("blur",()=>{
       let v=parseFloat(inp.value);
@@ -706,13 +830,12 @@ document.addEventListener('DOMContentLoaded', function(){
   });
 
   function flatterAxis(a){
-    // decide base 10° step and flatten logic
     const rem = Math.round(a/10)*10;
     let t1,t2;
     if(a<90){ t1=Math.max(0,rem-10); t2=rem+10; }
     else if(a>90){ t1=Math.min(180,rem+10); t2=rem-10; }
     else { t1=90; t2=100; }
-    if(t1===0) t1=180; // never show 0
+    if(t1===0) t1=180;
     if(t2<=0) t2+=180;
     return [t1,t2];
   }
@@ -732,7 +855,6 @@ document.addEventListener('DOMContentLoaded', function(){
       return { type:"sph", sph:r025(SE), cyl:0, axis:null, SE:roundDown025(SE) };
     }
 
-    // Toric 1/2/3
     const t1={S:rS,C:rC,A:axis1};
     const t2={S:rS,C:rC,A:axis2};
     let t3C=rC+0.5; if(t3C>-0.75)t3C=0;
@@ -746,17 +868,13 @@ document.addEventListener('DOMContentLoaded', function(){
     const div=document.getElementById(side==="re"?"reResult":"leResult");
     if(!div)return;
 
-if(data.type==="sph"){
-div.innerHTML=`${side.toUpperCase()} Spherical : S${fmt(data.sph)}`;
-return; // stop here; don't append SE again
-
-}
-
-else{
+    if(data.type==="sph"){
+      div.innerHTML=`${side.toUpperCase()} Spherical : S${fmt(data.sph)}`;
+      return;
+    } else {
       const t=(t,n)=>`${side.toUpperCase()} Toric ${n} : S${fmt(t.S)} C${fmt(t.C)} ×${t.A}`;
-const se=`${side.toUpperCase()} Spherical : S${fmt(data.SE)}`;
-div.innerHTML=[t(data.t1,1),t(data.t2,2),t(data.t3,3),se].join("<br>");
-
+      const se=`${side.toUpperCase()} Spherical : S${fmt(data.SE)}`;
+      div.innerHTML=[t(data.t1,1),t(data.t2,2),t(data.t3,3),se].join("<br>");
     }
   }
 
@@ -781,7 +899,7 @@ div.innerHTML=[t(data.t1,1),t(data.t2,2),t(data.t3,3),se].join("<br>");
     if(!reBox||!leBox)return;
     const f=(d)=>{
       if(!d)return"";
-if(d.type==="sph") return `S${fmt(d.sph)} C-0.00`;
+      if(d.type==="sph") return `S${fmt(d.sph)} C-0.00`;
       const sel=d[set];
       if(!sel) return `S${fmt(d.SE)}`;
       return `S${fmt(sel.S)} C${fmt(sel.C)} x${sel.A}`;
@@ -797,6 +915,44 @@ if(d.type==="sph") return `S${fmt(d.sph)} C-0.00`;
 })();
 </script>
 
+<script>
+/* =========================
+   Pro Mode (kept simple): hides/shows converter section
+========================= */
+(function(){
+  let isProfessional = false;
+  const btn = document.getElementById('modeToggleBtn');
+  const proSelectors = ['#specToCL']; // only converter is pro-only now
+
+  function setMode() {
+    proSelectors.forEach(sel => {
+      const el = document.querySelector(sel);
+      if (!el) return;
+      if (isProfessional) el.classList.remove('simple-hide');
+      else el.classList.add('simple-hide');
+    });
+
+    btn.textContent = isProfessional
+      ? 'Switch to Simple Mode'
+      : 'Switch to Professional Mode';
+  }
+
+  btn.addEventListener('click', () => {
+    isProfessional = !isProfessional;
+    setMode();
+  });
+
+  // start in simple mode by default
+  setMode();
+})();
+</script>
+
+<script>
+/* =========================
+   Kick off initial state
+========================= */
+// CSV load enables buttons; everything else is event-driven.
+</script>
 
 
 
@@ -808,14 +964,3 @@ if(d.type==="sph") return `S${fmt(d.sph)} C-0.00`;
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
