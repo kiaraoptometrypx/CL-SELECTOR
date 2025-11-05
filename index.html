@@ -229,11 +229,10 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
           <button id="showBtn" disabled>Loading...</button>
           <span id="btnText" style="opacity:0.8;"></span>
         </div>
-      </div>
-    </div>
+
 
     <!-- Sort bar + Results -->
-    <div id="sortBar" class="pane section" style="display:none;">
+    <div id="sortBar">
       <b>Sort:</b>
       <select id="sortSelect" style="padding:4px; font-size:12px; border-radius:10px">
         <option value="price-asc">Price Low → High</option>
@@ -246,6 +245,11 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
         <option value="hours-asc">Wearing hours Short → Long</option>
       </select>
     </div>
+      </div>
+    </div>
+
+<div id="compareArea"></div>
+
 
     <div class="results" id="results">
       <div id="cardsGrid"></div>
@@ -1057,6 +1061,113 @@ document.addEventListener('click', function (e) {
 </script>
 
 
+
+
+
+
+
+
+
+
+
+
+<script>
+/* =========================
+   Lens Comparison (Compare button only)
+========================= */
+let selectedCards = []; // store selected products
+
+function toggleCompare(cardEl, product, btn) {
+  const id = product["FULL NAME"] || "";
+  const isSelected = selectedCards.find(p => p["FULL NAME"] === id);
+
+  if (isSelected) {
+    // deselect
+    selectedCards = selectedCards.filter(p => p["FULL NAME"] !== id);
+    cardEl.style.outline = "";
+    btn.textContent = "Compare";
+  } else {
+    if (selectedCards.length >= 2) return; // block 3rd
+    selectedCards.push(product);
+    cardEl.style.outline = "3px solid #0b3d2e";
+    btn.textContent = "Remove";
+  }
+  updateCompareView();
+}
+
+function updateCompareView() {
+  const compBox = document.getElementById("compareBox") || createCompareBox();
+  if (selectedCards.length !== 2) {
+    compBox.style.display = "none";
+    return;
+  }
+
+  const [a, b] = selectedCards;
+  const priceA = a["1 BOX PRICE & UNIT"] || "-";
+  const priceB = b["1 BOX PRICE & UNIT"] || "-";
+  const hrsA = a["WEARING_HOURS"] ? `${parseFloat(a["WEARING_HOURS"])} hrs` : "-";
+  const hrsB = b["WEARING_HOURS"] ? `${parseFloat(b["WEARING_HOURS"])} hrs` : "-";
+  const typeA = a["VISION (SPH, ASTIG, MF)"] || "-";
+  const typeB = b["VISION (SPH, ASTIG, MF)"] || "-";
+
+  const isLooseA = /\bloose\b/i.test(a["FULL NAME"] || "");
+  const isLooseB = /\bloose\b/i.test(b["FULL NAME"] || "");
+  const leadA = parseInt(a["LEAD_TIME"] || "3", 10);
+  const leadB = parseInt(b["LEAD_TIME"] || "3", 10);
+  const etaA = computeETA(leadA, { looseStart: isLooseA }).text;
+  const etaB = computeETA(leadB, { looseStart: isLooseB }).text;
+
+  compBox.innerHTML = `
+    <h3 style="margin:0 0 8px;text-align:center;">Comparison</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <tr><th style="text-align:left;">Field</th><th>${a["FULL NAME"]}</th><th>${b["FULL NAME"]}</th></tr>
+      <tr><td><b>Price</b></td><td>${priceA}</td><td>${priceB}</td></tr>
+      <tr><td><b>Estimated Comfy Hours</b></td><td>${hrsA}</td><td>${hrsB}</td></tr>
+      <tr><td><b>Estimated Ready</b></td><td>${etaA}</td><td>${etaB}</td></tr>
+      <tr><td><b>Type</b></td><td>${typeA}</td><td>${typeB}</td></tr>
+    </table>
+    <p style="font-size:11px;text-align:center;margin-top:8px;opacity:.7;">
+      Click <b>Remove</b> on either lens to clear comparison.
+    </p>
+  `;
+  compBox.style.display = "block";
+}
+
+function createCompareBox() {
+  const box = document.createElement("div");
+  box.id = "compareBox";
+  box.style.background = "#fff";
+  box.style.border = "1px solid #ccc";
+  box.style.borderRadius = "10px";
+  box.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+  box.style.padding = "12px";
+  box.style.margin = "20px 0";
+document.getElementById("compareArea").appendChild(box);
+  return box;
+}
+
+/* Hook Compare button into cards */
+const oldBuildCards = buildCards;
+buildCards = function(list){
+  oldBuildCards(list);
+
+  list.forEach((p, idx)=>{
+    const card = document.getElementById("card_"+idx);
+    if(!card) return;
+
+    // Add Compare button
+    const btn = document.createElement("button");
+    btn.textContent = "Compare";
+    btn.style.marginTop = "6px";
+    btn.style.fontSize = "11px";
+    btn.addEventListener("click", (e)=>{
+      e.stopPropagation(); // prevent zoom
+      toggleCompare(card, p, btn);
+    });
+    card.appendChild(btn);
+  });
+};
+</script>
 
 
 
