@@ -98,11 +98,7 @@ input[type="checkbox"] { margin-right: 4px; }
 
 /* Expanded layout INSIDE LIGHTBOX */
 .zoom-card-flex{
-  display:flex;
-  flex-direction: column;      /* was row */
-  gap:12px;
-  align-items:center;          /* center the big photo */
-  flex-wrap:nowrap;            /* no wrapping when vertical */
+  display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;
 }
 .zoom-card-flex .photo img{
   width:500px; max-width:100%; height:auto;
@@ -964,3 +960,4 @@ document.addEventListener('DOMContentLoaded', function(){
 
 </body>
 </html>
+
