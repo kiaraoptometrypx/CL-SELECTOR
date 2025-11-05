@@ -376,9 +376,35 @@ input[type="checkbox"]:focus {
 })();
 </script>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script>
 /* =========================
-   Contact Lens Selector – CSV / Filters / Results
+   RESULTS ENGINE (CSV → Filters → Cards → Lightbox)
+   - Includes WEARING_HOURS on cards + in lightbox
+   - Respects Promo Only + all questionnaires
 ========================= */
 const csvUrl = 'https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL%20DATABASE.csv';
 
@@ -394,8 +420,8 @@ const sortSelect = document.getElementById('sortSelect');
 const rxToggleBtn = document.getElementById('rxToggleBtn');
 const rxIcons = document.getElementById('rxIcons');
 
-/* ---- RX images toggle ---- */
-rxToggleBtn.addEventListener('click', ()=>{
+/* ---- RX icons toggle ---- */
+rxToggleBtn?.addEventListener('click', ()=>{
   rxIcons.style.display = (rxIcons.style.display === 'none' || rxIcons.style.display === '') ? 'flex' : 'none';
 });
 
@@ -425,9 +451,9 @@ fetch(csvUrl, { cache: 'no-store' })
       return obj;
     });
     csvLoaded = true;
-    if (showBtn)  { showBtn.disabled = false; showBtn.textContent = 'Show Results'; }
-    if (promoBtn) { promoBtn.disabled = false; promoBtn.textContent = 'Show Promo Only'; }
-    if (btnText)  btnText.textContent = '';
+    showBtn && (showBtn.disabled = false, showBtn.textContent = 'Show Results');
+    promoBtn && (promoBtn.disabled = false, promoBtn.textContent = 'Show Promo Only');
+    btnText && (btnText.textContent = '');
   })
   .catch(err => {
     console.error("CSV Load Error:", err);
@@ -449,27 +475,23 @@ function filterProducts(selected, query){
   const q1Col = "LENS TYPE (CLEAR, COLOUR)";
   const mCol  = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
   const vCol  = "VISION (SPH, ASTIG, MF)";
-
-  // Split columns in CSV:
   const COMFORT_COL  = "COMFORT";            // BASIC / GOOD / PREMIUM
   const MATERIAL_COL = "MATERIAL";           // HYDROGEL / SILICONE HYDROGEL
 
   const terms = (query || '').toLowerCase().split(/\s+/).filter(Boolean);
 
   return products.filter(p => {
-    const lensType = (p[q1Col]  || '').trim().toUpperCase();
-    const modality = (p[mCol]   || '').trim().toUpperCase();
-    const vision   = (p[vCol]   || '').trim().toUpperCase();
-
-    const comfort  = (p[COMFORT_COL]  || '').trim().toUpperCase();
-    const material = (p[MATERIAL_COL] || '').trim().toUpperCase();
+    const lensType = (p[q1Col]  || '').toUpperCase();
+    const modality = (p[mCol]   || '').toUpperCase();
+    const vision   = (p[vCol]   || '').toUpperCase();
+    const comfort  = (p[COMFORT_COL]  || '').toUpperCase();
+    const material = (p[MATERIAL_COL] || '').toUpperCase();
 
     if (selected.q1.length && !selected.q1.includes(lensType)) return false;
     if (selected.q2.length && !selected.q2.includes(modality)) return false;
     if (selected.q3.length && !selected.q3.includes(vision))   return false;
-
-    if (selected.q4.length && !selected.q4.includes(comfort))  return false;     // COMFORT
-    if (selected.q5.length && !selected.q5.includes(material)) return false;     // MATERIAL
+    if (selected.q4.length && !selected.q4.includes(comfort))  return false;
+    if (selected.q5.length && !selected.q5.includes(material)) return false;
 
     // Q6: Loose vs Not Loose — detect by FULL NAME containing "loose"
     const fullName = p["FULL NAME"] || "";
@@ -488,7 +510,6 @@ function filterProducts(selected, query){
       const rowText = Object.values(p).join(" ").toLowerCase();
       if (!terms.every(t => rowText.includes(t))) return false;
     }
-
     return true;
   });
 }
@@ -505,10 +526,7 @@ function getNumericValuePerPair(p){
   const m = text.match(/(\d+(\.\d+)?)/);
   return m ? parseFloat(m[1]) : Number.POSITIVE_INFINITY;
 }
-function niceCase(s=""){
-  s = String(s).toLowerCase();
-  return s.replace(/\b\w/g, c => c.toUpperCase());
-}
+function niceCase(s=""){ return String(s).toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
 function mapMaterial(s=""){
   const u = s.toUpperCase().trim();
   if (u === "HYDROGEL") return "Hydrogel (Standard Oxygen)";
@@ -542,9 +560,7 @@ function showResults(){
   let overlapping = reFiltered.filter(p => setLE.has(p["FULL NAME"]));
 
   // Promo-only respects current filters
-  if (promoOnlyMode) {
-    overlapping = overlapping.filter(p => (p["PROMO"] || "").trim().length > 0);
-  }
+  if (promoOnlyMode) overlapping = overlapping.filter(p => (p["PROMO"] || "").trim().length > 0);
 
   renderCards(overlapping);
 }
@@ -552,8 +568,7 @@ function showResults(){
 /* ---- Enter to search ---- */
 ["searchRE","searchLE"].forEach(id => {
   const el = document.getElementById(id);
-  if (!el) return;
-  el.addEventListener("keydown", e => {
+  el && el.addEventListener("keydown", e => {
     if (e.key === "Enter") { e.preventDefault(); showResults(); }
   });
 });
@@ -584,7 +599,7 @@ sortSelect?.addEventListener("change", ()=>{
   buildCards(items);
 });
 
-/* ---- Render Cards (compact only; click => lightbox big view) ---- */
+/* ---- Render Cards (compact; click => lightbox big view) ---- */
 function renderCards(data){
   const container = document.getElementById("cardsGrid");
   const bar = document.getElementById("sortBar");
@@ -620,6 +635,7 @@ function buildCards(list){
   const H_PROMO   = "PROMO";
   const H_COMFORT = "COMFORT";
   const H_MAT     = "MATERIAL";
+  const H_HOURS   = "WEARING_HOURS";
 
   const html = list.map((p, idx) => {
     const id = "card_" + idx;
@@ -635,44 +651,36 @@ function buildCards(list){
 
     const price = p[H_PRICE] || "";
     const value = p[H_VALUE] || "";
+    const hoursRaw = p[H_HOURS] || "";
+    const hours = hoursRaw ? `${parseFloat(hoursRaw)} hrs` : "";  // ← FIXED
 
-return `
-  <div id="${id}" class="pane lens-card card-compact" style="position:relative;">
-    ${hasPromo ? `<div class="promo-badge">🔥 ${promo}</div>` : ""}
-    <div style="font-weight:700; margin-bottom:6px;">${name}</div>
-    <div class="photo" style="margin-bottom:6px;">
-      ${
-        hasPhoto
-        ? `<img src="${photoURL}" alt="${name}" onerror="this.style.display='none'">`
-        : `<div style="width:180px; height:120px; display:flex; align-items:center; justify-content:center; color:#666; border:1px dashed #ccc; border-radius:10px;">No photo</div>`
-      }
-    </div>
-    <div>${price}</div>
-    <div>${value || "-"}</div>
-  </div>`;
-
+    return `
+      <div id="${id}" class="pane lens-card card-compact" style="position:relative;">
+        ${hasPromo ? `<div class="promo-badge">🔥 ${promo}</div>` : ""}
+        <div style="font-weight:700; margin-bottom:6px;">${name}</div>
+        <div class="photo" style="margin-bottom:6px;">
+          ${
+            hasPhoto
+            ? `<img src="${photoURL}" alt="${name}" onerror="this.style.display='none'">`
+            : `<div style="width:180px; height:120px; display:flex; align-items:center; justify-content:center; color:#666; border:1px dashed #ccc; border-radius:10px;">No photo</div>`
+          }
+        </div>
+        <div><b>Price :</b>${price}</div>
+        <div><b>Value Per Piece :</b>${value || "-"}</div>
+        <div><b>Estimated Comfy Hours :</b>${hours}</div>
+      </div>`;
   }).join("");
 
   grid.innerHTML = html;
 
-  // Click card => open LIGHTBOX with BIG (500px) full details
+  // Click card => open LIGHTBOX with BIG content (photo on top, details below)
   list.forEach((p, idx) => {
     const id = "card_" + idx;
     const el = document.getElementById(id);
     if (!el) return;
 
     el.addEventListener('click', ()=>{
-      const H_DISPOSE = "MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
-      const H_PRICE   = "1 BOX PRICE & UNIT";
-      const H_VALUE   = "VALUE_PER_PAIR";
-      const H_PROMO   = "PROMO";
-      const H_COMFORT = "COMFORT";
-      const H_MAT     = "MATERIAL";
-
       const name     = p["FULL NAME"] || "";
-      const promo    = (p[H_PROMO] || "").trim();
-      const hasPromo = promo.length > 0;
-
       const photoKey = (p["PHOTO"] || "").trim();
       const hasPhoto = !!photoKey;
       const photoURL = hasPhoto
@@ -682,84 +690,59 @@ return `
       const dispose  = p[H_DISPOSE] || "";
       const price    = p[H_PRICE]   || "";
       const value    = p[H_VALUE]   || "";
-      const comfort  = (p[H_COMFORT] || "");
-      const material = (p[H_MAT]     || "");
+      const comfort  = p[H_COMFORT] || "";
+      const material = p[H_MAT]     || "";
+      const promo    = (p[H_PROMO]  || "").trim();
+      const hasPromo = promo.length > 0;
+      const hoursRaw = p[H_HOURS]   || "";
+      const hours    = hoursRaw ? `${parseFloat(hoursRaw)} hrs` : "";
 
       const comfortNice  = niceCase(comfort);
       const materialNice = mapMaterial(material);
 
       const expandedHTML = `
-        <div class="zoom-card-flex">
-          <div class="photo">
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="text-align:center;">
             ${
               hasPhoto
-              ? `<img src="${photoURL}" alt="${name}" onerror="this.style.display='none'">
-`
-              : `<div style="width:500px; height:333px; display:flex; align-items:center; justify-content:center; color:#666; border:1px dashed #ccc; border-radius:10px;">No photo</div>`
+              ? `<img src="${photoURL}" alt="${name}" style="width:500px; max-width:100%; height:auto; border:1px solid #ccc; border-radius:10px;">`
+              : `<div style="width:500px; max-width:100%; height:333px; display:flex; align-items:center; justify-content:center; color:#666; border:1px dashed #ccc; border-radius:10px; margin:0 auto;">No photo</div>`
             }
           </div>
           <div class="details">
-            <div style="font-weight:700;">${name}</div>
+            <div style="font-weight:700; margin-bottom:4px;">${name}</div>
             <div><b>Dispose Period:</b> ${dispose}</div>
-            <div>
-              <b>Comfort:</b> ${comfortNice}
-              <button class="info-btn" data-tip="Comfort is enhanced using more slippery coating, material softness and thinness, and improved quality of the liquid that contains the lens." style="margin-left:6px;padding:2px 6px;">ℹ️</button>
-            </div>
-            <div>
-              <b>Material:</b> ${materialNice}
-              <button class="info-btn" data-tip="Material is enhanced when silicone is embedded in. It makes the lens more breathable, allowing longer wearing hours without interruption." style="margin-left:6px;padding:2px 6px;">ℹ️</button>
-            </div>
+            <div><b>Comfort:</b> ${comfortNice}</div>
+            <div><b>Material:</b> ${materialNice}</div>
+            <div><b>Estimated wearing hours:</b> ${hours || "-"}</div>
             <div><b>Average cost per pair:</b> ${value || "-"}</div>
-            <div style="height:5px"></div>
+            <div style="height:10px"></div>
             <div><b>Price Per Pack & Qty:</b> ${price}</div>
             <div><b>Current Promo:</b> ${hasPromo ? promo : "Not at the moment"}</div>
           </div>
         </div>
       `;
 
-      if (window.__openCardZoom) window.__openCardZoom(expandedHTML);
-
-      // enable tooltip inside lightbox
-      setTimeout(()=>{
-        document.querySelectorAll('#zoomCardBox .info-btn').forEach(btn=>{
-          btn.addEventListener('click', (ev)=>{
-            ev.stopPropagation();
-            const text = btn.getAttribute('data-tip') || '';
-            showTipNear(btn, text);
-          });
-        });
-      }, 0);
+      window.__openCardZoom && window.__openCardZoom(expandedHTML);
     });
   });
 }
-
-/* ---- Floating tooltip (tap) ---- */
-let activeTipEl = null;
-function showTipNear(anchor, text){
-  hideTip();
-  const rect = anchor.getBoundingClientRect();
-  const tip = document.createElement('div');
-  tip.className = 'tip-bubble';
-  tip.textContent = text;
-  document.body.appendChild(tip);
-
-  const pad = 6;
-  const top = rect.bottom + pad + window.scrollY;
-  const left = rect.left + window.scrollX;
-  tip.style.top = top + 'px';
-  tip.style.left = left + 'px';
-  activeTipEl = tip;
-
-  setTimeout(()=>{ document.addEventListener('click', onDocClickClose, { once:true }); }, 0);
-}
-function onDocClickClose(){ hideTip(); }
-function hideTip(){
-  if (activeTipEl && activeTipEl.parentNode){
-    activeTipEl.parentNode.removeChild(activeTipEl);
-  }
-  activeTipEl = null;
-}
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <script>
 /* =========================
@@ -960,4 +943,3 @@ document.addEventListener('DOMContentLoaded', function(){
 
 </body>
 </html>
-
