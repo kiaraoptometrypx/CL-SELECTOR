@@ -45,7 +45,19 @@ input[type="checkbox"]{margin-right:4px}
 .zoom-card-flex .details{display:flex;flex-direction:column;gap:8px}
 
 /* Promo ribbon */
-.promo-badge{position:absolute;top:6px;left:6px;background:#d60000;color:#fff;padding:2px 6px;font-size:10px;border-radius:10px;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.promo-badge {
+  position: static !important;
+  margin-top: 8px;
+  text-align: center;
+  background: #d60000;
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 400;
+  display: inline-block;
+  padding: 3px 8px;
+  box-shadow: none;
+}
+
 
 /* Buttons */
 button{background:#0b3d2e;color:#fff;border:none;padding:6px 12px;border-radius:10px;cursor:pointer}
@@ -72,8 +84,8 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 .def-row .def-extra{display:none;margin:6px 0 0 0;font-weight:400} /* long text NOT bold */
 
 /* RX icons row */
-.rx-icons{display:flex;gap:10px;align-items:center;margin-top:8px}
-.rx-icons img{height:32px;width:auto;border:1px solid #ccc;border-radius:6px;padding:2px;background:#fff}
+.rx-icons{display:flex;gap:50px;align-items:center;margin-top:8px}
+.rx-icons img{height:200px;width:auto;border:1px solid #ccc;border-radius:6px;padding:2px;background:#fff}
 
 /* Responsive */
 @media (max-width:900px){#cardsGrid{grid-template-columns:repeat(2,minmax(220px,1fr))}}
@@ -112,19 +124,22 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
     <!-- Q3: Vision (+ RX icons toggle) -->
     <div class="section" id="q3">
-      <h2>What type of prescription (RX)?</h2>
+      <h2>What type of prescription (RX)? <button id="rxToggleBtn" style="font-size:12px">Show / Hide RX Examples </button></h2>
+      <div style="margin-top:8px;">
+
+      <div id="rxIcons" class="rx-icons" style="display:none;">
+        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/SPH.png" alt="SPH">
+        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/ASTIG.png" alt="ASTIG">
+        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/MF.png" alt="MF">
+
+      </div>
+</div>
+      <div style="margin-top:8px;"></div>
+
       <div class="options">
         <label><input type="checkbox" name="q3" value="SPH">Short or Far Sighted (SPH)</label>
         <label><input type="checkbox" name="q3" value="ASTIG">With Astigmatism (ASTIG)</label>
         <label><input type="checkbox" name="q3" value="MF">Multi-focal (MF)</label>
-      </div>
-      <div style="margin-top:8px;">
-        <button id="rxToggleBtn">Show / Hide</button>
-      </div>
-      <div id="rxIcons" class="rx-icons" style="display:none;">
-        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/RX-IMAGES/SPH.png" alt="SPH">
-        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/RX-IMAGES/ASTIG.png" alt="ASTIG">
-        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/RX-IMAGES/MF.png" alt="MF">
       </div>
     </div>
 
@@ -140,7 +155,13 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
     <div style="height:10px"></div>
     <div style="text-align:center; margin-bottom:10px;">
       <button id="modeToggleBtn" style="font-size:12px">Switch to Professional Mode</button>
+
+
     </div>
+
+
+
+
     <div style="height:10px"></div>
 
     <!-- Q4: Comfort -->
@@ -223,11 +244,12 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
     <!-- Action buttons -->
     <div class="section" id="actionsSec">
       <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-        <button id="promoBtn" disabled>Show Promo Only</button>
+        <button id="promoBtn" style="font-size:12px" disabled>Show Promo Only</button>
         <div style="height:10px"></div>
         <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-          <button id="showBtn" disabled>Loading...</button>
+          <button id="showBtn" style="font-size:12px" disabled>Loading...</button>
           <span id="btnText" style="opacity:0.8;"></span>
+<button id="resetBtn" style="font-size:12px">Reset / Clear All</button>
         </div>
 
 
@@ -619,26 +641,84 @@ function computeETA(leadDays, opts={}){
 /* Show Results pipeline */
 let promoOnlyMode=false;
 
-function showResults(){
-  if(!csvLoaded) return;
-  const selected=getSelections();
+function showResults() {
+  if (!csvLoaded) return;
+  const selected = getSelections();
 
-  const reInput=(document.getElementById("searchRE")?.value||"").trim().toLowerCase();
-  let   leInput=(document.getElementById("searchLE")?.value||"").trim().toLowerCase();
-  if(!leInput) leInput=reInput;
+  const reInput = (document.getElementById("searchRE")?.value || "").trim().toLowerCase();
+  const leInput = (document.getElementById("searchLE")?.value || "").trim().toLowerCase();
 
-  const reFiltered=filterProducts(selected,reInput);
-  const leFiltered=filterProducts(selected,leInput);
+  const reHasAstig = /c-?(0\.[1-9]|[1-9])/i.test(reInput);
+  const leHasAstig = /c-?(0\.[1-9]|[1-9])/i.test(leInput);
 
-  // Overlap BOTH eyes
-  const setLE=new Set(leFiltered.map(p=>p["FULL NAME"]));
-  let overlapping=reFiltered.filter(p=>setLE.has(p["FULL NAME"]));
+  // Detect which side has astig
+  let toricInput = "", sphereInput = "";
+  if (reHasAstig && !leHasAstig) {
+    toricInput = reInput;
+    sphereInput = leInput;
+  } else if (leHasAstig && !reHasAstig) {
+    toricInput = leInput;
+    sphereInput = reInput;
+  } else {
+    // both or neither → fallback to current overlap logic
+    const reFiltered = filterProducts(selected, reInput);
+    const leFiltered = filterProducts(selected, leInput || reInput);
+    const setLE = new Set(leFiltered.map(p => p["FULL NAME"]));
+    let overlapping = reFiltered.filter(p => setLE.has(p["FULL NAME"]));
+    if (promoOnlyMode) overlapping = overlapping.filter(p => (p["PROMO"] || "").trim().length > 0);
+    return renderCards(overlapping);
+  }
 
-  // Promo-only
-  if(promoOnlyMode) overlapping=overlapping.filter(p=>(p["PROMO"]||"").trim().length>0);
+  // --- STEP 1: find ASTIG products for the C side
+  const toricFiltered = filterProducts(selected, toricInput).filter(p =>
+    (p["VISION (SPH, ASTIG, MF)"] || "").toUpperCase().includes("ASTIG")
+  );
 
-  renderCards(overlapping);
+  if (!toricFiltered.length) {
+    renderCards([]);
+    return;
+  }
+
+  // --- STEP 2: find all matching PRODUCT names
+  const productNames = new Set(toricFiltered.map(p => (p["PRODUCT"] || "").toUpperCase()));
+
+  // --- STEP 3: find spherical versions with same PRODUCT
+  const sphereFiltered = products.filter(p =>
+    productNames.has((p["PRODUCT"] || "").toUpperCase()) &&
+    (p["VISION (SPH, ASTIG, MF)"] || "").toUpperCase().includes("SPH")
+  );
+
+  // --- STEP 4: combine toric first, then spherical
+  let combined = [...toricFiltered, ...sphereFiltered];
+
+  // --- STEP 5: promo-only filter
+  if (promoOnlyMode) {
+    combined = combined.filter(p => (p["PROMO"] || "").trim().length > 0);
+  }
+
+// --- STEP 6: group so pairs appear together
+combined.sort((a, b) => {
+  const prodA = (a["PRODUCT"] || "").toUpperCase();
+  const prodB = (b["PRODUCT"] || "").toUpperCase();
+  if (prodA !== prodB) return prodA.localeCompare(prodB); // group by product
+
+  const order = { ASTIG: 1, SPH: 2, MF: 3 };
+  const vA = order[(a["VISION (SPH, ASTIG, MF)"] || "").toUpperCase()] || 99;
+  const vB = order[(b["VISION (SPH, ASTIG, MF)"] || "").toUpperCase()] || 99;
+  return vA - vB; // toric first, then SPH, then MF
+});
+
+
+  renderCards(combined);
 }
+
+
+
+
+
+
+
+
 
 /* Enter to search */
 ["searchRE","searchLE"].forEach(id=>{
@@ -705,7 +785,7 @@ function buildCards(list){
   const grid=document.getElementById("cardsGrid");
   if(!grid) return;
 
-  const H_DISPOSE="MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
+  const H_DISPOSE="MODALITY (1 day, 2 weeks, 1 month, 3 months)";
   const H_PRICE ="1 BOX PRICE & UNIT";
   const H_VALUE ="VALUE_PER_PAIR";
   const H_PROMO ="PROMO";
@@ -738,13 +818,13 @@ const etaText  = computeETA(leadDays, { looseStart: isLoose }).text;
 
     return `
       <div id="${id}" class="pane lens-card card-compact" style="position:relative;">
-        ${hasPromo?`<div class="promo-badge">🔥 ${promo}</div>`:""}
         <div style="font-weight:700; margin-bottom:6px;">${name}</div>
         <div class="photo" style="margin-bottom:6px;">
           ${ hasPhoto
               ? `<img src="${photoURL}" alt="${name}" onerror="this.style.display='none'">`
               : `<div style="width:180px;height:120px;display:flex;align-items:center;justify-content:center;color:#666;border:1px dashed #ccc;border-radius:10px;">No photo</div>`
           }
+${hasPromo?`<div class="promo-badge">🔥 ${promo}</div>`:""}
         </div>
         <div><b>Price :</b> ${price}</div>
         <div><b>Value Per Piece :</b> ${value || "-"}</div>
@@ -898,15 +978,26 @@ document.addEventListener('DOMContentLoaded',function(){
     });
   });
 
-  function flatterAxis(a){
-    const rem=Math.round(a/10)*10; let t1,t2;
-    if(a<90){ t1=Math.max(0,rem-10); t2=rem+10; }
-    else if(a>90){ t1=Math.min(180,rem+10); t2=rem-10; }
-    else { t1=90; t2=100; }
-    if(t1===0) t1=180;
-    if(t2<=0) t2+=180;
-    return [t1,t2];
-  }
+function flatterAxis(a){
+  // Ensure valid number 0–180
+  a = parseFloat(a) || 0;
+  if (a <= 0) a = 180;
+
+  // Round to nearest 10 degrees (standard clinical rule)
+  const rounded = Math.round(a / 10) * 10;
+
+  // Keep within 1–180
+  const fixed = (rounded > 180) ? 180 : rounded;
+
+  // Generate a small ±10° range around the rounded axis
+  let t1 = fixed - 10;
+  let t2 = fixed + 10;
+  if (t1 < 1) t1 = 180 + t1; // wrap around
+  if (t2 > 180) t2 = t2 - 180;
+
+  return [fixed, t1, t2];
+}
+
 
   function convertOne(S,C,A){
     S=parseFloat(S)||0; C=parseFloat(C)||0; A=parseFloat(A)||0;
@@ -1173,6 +1264,11 @@ buildCards = function(list){
 
 
 
+<script>
+  document.getElementById('resetBtn')?.addEventListener('click', () => {
+    location.reload(); // hard refresh behavior is fine here
+  });
+</script>
 
 
 
