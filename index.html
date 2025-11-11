@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>Contact Lens Selector</title>
-<meta name="viewport" content="width=device-width, initial-scale=0.75" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
 /* === Lightbox (shared) === */
 #imgZoom{position:fixed;inset:0;display:none;background:rgba(0,0,0,.75);align-items:center;justify-content:center;z-index:10000;cursor:zoom-out}
@@ -119,6 +119,55 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
 <div style="height:20px"></div>
 
+<!-- Floating toggle button -->
+<button id="scaleToggle" style="
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#0b3d2e;
+  color:#fff;
+  border:none;
+  border-radius:50%;
+  width:48px;
+  height:48px;
+  font-size:20px;
+  cursor:pointer;
+  z-index:9999;
+  box-shadow:0 4px 10px rgba(0,0,0,0.3);
+  transition:transform 0.2s ease, background 0.2s ease;
+">
+  🔍
+</button>
+
+<script>
+let scaled = false;
+const btn = document.getElementById('scaleToggle');
+
+btn.addEventListener('click', () => {
+  const html = document.documentElement;
+  const body = document.body;
+  scaled = !scaled;
+
+  if (scaled) {
+    body.style.transform = 'scale(0.8)';
+    body.style.transformOrigin = 'top center';
+    body.style.margin = '0 auto';
+    body.style.width = '125%'; // optional for wide pages
+    html.style.display = 'flex';
+    html.style.justifyContent = 'center';
+    btn.textContent = '🔎';
+  } else {
+    body.style.transform = 'scale(1)';
+    body.style.width = '100%';
+    html.style.display = '';
+    html.style.justifyContent = '';
+    btn.textContent = '🔍';
+  }
+});
+</script>
+
+
+
   <h1>
     Hello! Welcome to Kiara Optometry Contact Lens Selector
   </h1>
@@ -138,10 +187,10 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
     <div class="section" id="q2">
       <h2>What type of disposable?</h2>
       <div class="options">
-        <label><input type="checkbox" name="q2" value="1 Day">1 Day</label>
-        <label><input type="checkbox" name="q2" value="2 Weeks">2 Weeks</label>
-        <label><input type="checkbox" name="q2" value="1 Month">1 Month</label>
-        <label><input type="checkbox" name="q2" value="3 Months">3 Months</label>
+        <label><input type="checkbox" name="q2" value="1 DAY">1 Day</label>
+        <label><input type="checkbox" name="q2" value="2 WEEKS">2 Weeks</label>
+        <label><input type="checkbox" name="q2" value="1 MONTH">1 Month</label>
+        <label><input type="checkbox" name="q2" value="3 MONTHS">3 Months</label>
       </div>
     </div>
 
@@ -410,7 +459,7 @@ function getSelections(){
 /* Filter core */
 function filterProducts(selected,query){
   const q1Col="LENS TYPE (CLEAR, COLOUR)";
-  const mCol ="MODALITY (1 Day, 2 Weeks, 1 Month, 3 Months)";
+  const mCol ="MODALITY (1 DAY, 2 WEEKS, 1 MONTH, 3 MONTHS)";
   const vCol ="VISION (SPH, ASTIG, MF)";
   const COMFORT_COL="COMFORT";
   const MATERIAL_COL="MATERIAL";
@@ -1318,6 +1367,3 @@ buildCards = function(list){
 
 </body>
 </html>
-
-
-
