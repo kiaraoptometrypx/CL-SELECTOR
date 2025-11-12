@@ -23,6 +23,9 @@ h2{font-size:13px;margin:6px 0 8px}
 
 /* ========= Sections ========= */
 .section{background:#ffffe0;border:1px solid #d7d7cf;border-radius:10px;padding:8px;margin:8px 0}
+.section2{background:#f5f5b5;border:1px solid #d7d7cf;border-radius:10px;padding:8px;margin:8px 0}
+.section3{background:#fff;border:1px solid #d7d7cf;border-radius:10px;padding:8px;margin:8px 0}
+
 .lens-card{padding:12px;border:1px solid #d7d7cf;border-radius:10px;background:#ffffe0;box-shadow:0 1px 0 rgba(0,0,0,.04);transition:box-shadow .15s ease,transform .15s ease;cursor:pointer}
 .lens-card:hover{box-shadow:0 4px 10px rgba(0,0,0,.06);transform:translateY(-1px)}
 
@@ -84,8 +87,8 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 .def-row .def-extra{display:none;margin:6px 0 0 0;font-weight:400} /* long text NOT bold */
 
 /* RX icons row */
-.rx-icons{display:flex;gap:50px;align-items:center;margin-top:8px}
-.rx-icons img{height:200px;width:auto;border:1px solid #ccc;border-radius:6px;padding:2px;background:#fff}
+.rx-icons{display:flex;gap:10px;align-items:center;margin-top:8px}
+.rx-icons img{max-height:auto;max-width:70%;border:1px solid #ccc;border-radius:6px;padding:2px;background:#fff}
 
 /* Responsive */
 @media (max-width:900px){#cardsGrid{grid-template-columns:repeat(2,minmax(220px,1fr))}}
@@ -108,15 +111,24 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 <!-- Main content (hidden until password ok) -->
 <div class="container" id="content" style="display:none;">
 
+
+
+<div style="height:500px"></div>
+  <h1>
+    Hello! Welcome to Kiara Optometry Contact Lens Selector
+  </h1>
+
+<div style="height:500px"></div>
+
 <div class="wrap">
 
 
 
-
-
+<h1>Current Promo that's worth your while!</h1>
+<div class="section3">
 <!-- Welcome banner -->
-<div id="welcomeBanner"
-     style="display:flex; justify-content:center; gap:50px; margin:20px 0;">
+<div style="display:flex; justify-content:center; gap:50px; margin:20px 0;">
+
   <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL_SPEC_PROMO.png"
        style="width:45%; border-radius:5px;">
 
@@ -130,48 +142,20 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
 
 </div>
-
+</div>
 
 
 
 <div style="height:20px"></div>
 
-
-
-  <h1>
-    Hello! Welcome to Kiara Optometry Contact Lens Selector <button id="scaleToggle">
-  🔍
-</button>
-  </h1>
 </div>
 
 
-<script>
-let scaled = false;
-const btn = document.getElementById('scaleToggle');
 
-btn.addEventListener('click', () => {
-  const html = document.documentElement;
-  const body = document.body;
-  scaled = !scaled;
 
-  if (scaled) {
-    body.style.transform = 'scale(0.8)';
-    body.style.transformOrigin = 'top center';
-    body.style.margin = '0 auto';
-    body.style.width = '125%'; // optional for wide pages
-    html.style.display = 'flex';
-    html.style.justifyContent = 'center';
-    btn.textContent = '🔎';
-  } else {
-    body.style.transform = 'scale(1)';
-    body.style.width = '100%';
-    html.style.display = '';
-    html.style.justifyContent = '';
-    btn.textContent = '🔍';
-  }
-});
-</script>
+<h1> Search your Lenses below! <button id="scaleToggle">
+  🔍
+</button> </h1>
 
     <!-- Q1: Clear or Colour -->
     <div class="section" id="q1">
@@ -195,13 +179,25 @@ btn.addEventListener('click', () => {
 
     <!-- Q3: Vision (+ RX icons toggle) -->
     <div class="section" id="q3">
-      <h2>What type of prescription (RX)? <button id="rxToggleBtn" style="font-size:12px">Show / Hide RX Examples </button></h2>
+      <h2>What type of prescription (RX)? <span id="rxToggleBtn" style="user-select:none; font-size:12px"><u>See examples of types of RX</u> </span></h2>
       <div style="margin-top:8px;">
 
       <div id="rxIcons" class="rx-icons" style="display:none;">
-        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/SPH.png" alt="SPH">
-        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/ASTIG.png" alt="ASTIG">
-        <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/MF.png" alt="MF">
+<label>
+  <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/SPH.png" alt="SPH"><br><br>
+  SPH lenses only have one prescription, e.g. -5.00 which is indicated by D.
+</label>
+
+<label>
+  <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/ASTIG.png" alt="ASTIG"><br><br>
+  ASTIG lenses have 2 extra prescription, e.g. -1.75 and 030.
+</label>
+
+<label>
+  <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/MF.png" alt="MF"><br><br>
+  MF lenses have ADD prescription, e.g. MID (or LOW or HI).
+</label>
+
 
       </div>
 </div>
@@ -223,8 +219,7 @@ btn.addEventListener('click', () => {
       </div>
     </div>
 
-    <div style="height:10px"></div>
-    <div style="text-align:center; margin-bottom:10px;">
+    <div class="section2" style="text-align:center; margin-bottom:10px;">
       <button id="modeToggleBtn" style="font-size:12px">Switch to Professional Mode</button>
 
 
@@ -233,10 +228,9 @@ btn.addEventListener('click', () => {
 
 
 
-    <div style="height:10px"></div>
 
     <!-- Q4: Comfort -->
-    <div class="section" id="q4">
+    <div class="section2" id="q4">
       <h2>Comfort level?</h2>
       <div class="options">
         <label><input type="checkbox" name="q4" value="BASIC">Basic</label>
@@ -246,7 +240,7 @@ btn.addEventListener('click', () => {
     </div>
 
     <!-- Q5: Material -->
-    <div class="section" id="q5">
+    <div class="section2" id="q5">
       <h2>Material type?</h2>
       <div class="options">
         <label><input type="checkbox" name="q5" value="HYDROGEL">Hydrogel (Standard Oxygen)</label>
@@ -255,7 +249,7 @@ btn.addEventListener('click', () => {
     </div>
 
     <!-- Converter (Pro mode can hide/show) -->
-    <div class="section" id="specToCL">
+    <div class="section2" id="specToCL">
       <h2>Spectacle → Contact Lens Power Converter</h2>
 
       <!-- Input Row -->
@@ -1344,7 +1338,32 @@ buildCards = function(list){
 
 
 
+<script>
+let scaled = false;
+const btn = document.getElementById('scaleToggle');
 
+btn.addEventListener('click', () => {
+  const html = document.documentElement;
+  const body = document.body;
+  scaled = !scaled;
+
+  if (scaled) {
+    body.style.transform = 'scale(0.8)';
+    body.style.transformOrigin = 'top center';
+    body.style.margin = '0 auto';
+    body.style.width = '125%'; // optional for wide pages
+    html.style.display = 'flex';
+    html.style.justifyContent = 'center';
+    btn.textContent = '🔎';
+  } else {
+    body.style.transform = 'scale(1)';
+    body.style.width = '100%';
+    html.style.display = '';
+    html.style.justifyContent = '';
+    btn.textContent = '🔍';
+  }
+});
+</script>
 
 
 
