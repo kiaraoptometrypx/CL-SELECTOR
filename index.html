@@ -158,9 +158,36 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
 
 
-<a href="https://wa.me/601170199170" target="_blank" style="text-decoration:none; color:#0b3d2e;">
-  Chat with us on WhatsApp
-</a>
+<div style="text-align:center; margin-top:20px; display:flex; flex-direction:column; align-items:center; gap:10px;">
+
+  <!-- Number input -->
+  <input id="waNumber" type="text" placeholder="Enter phone number (e.g. 60122013911)"
+         style="padding:6px; width:260px; border-radius:6px; border:1px solid #aaa; text-align:center;">
+
+  <!-- Message box -->
+  <textarea id="waMessage" rows="3" style="width:260px; padding:6px; border-radius:6px; border:1px solid #aaa;">
+Hi! I'm interested in your contact lenses promo.
+  </textarea>
+
+  <!-- Send button -->
+  <button onclick="openWhatsApp()" style="padding:6px 12px; border-radius:6px; background:#0b3d2e; color:#fff; border:none; cursor:pointer;">
+    Open WhatsApp
+  </button>
+
+</div>
+
+<script>
+function openWhatsApp() {
+  const num = document.getElementById("waNumber").value.trim();
+  const msg = document.getElementById("waMessage").value.trim();
+  if (!num) return alert("Please enter a phone number");
+  if (!msg) return alert("Please enter a message");
+
+  const url = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank");
+}
+</script>
+
 
 <h1> Search your Lenses below! <button id="scaleToggle">
   🔍
@@ -1401,6 +1428,7 @@ btn.addEventListener('click', () => {
 
 
 </html>
+
 
 
 
