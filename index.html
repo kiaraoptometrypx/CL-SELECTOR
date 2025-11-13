@@ -160,33 +160,258 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
 <div style="text-align:center; margin-top:20px; display:flex; flex-direction:column; align-items:center; gap:10px;">
 
-  <!-- Number input -->
-  <input id="waNumber" type="text" placeholder="Enter phone number (e.g. 60122013911)"
-         style="padding:6px; width:260px; border-radius:6px; border:1px solid #aaa; text-align:center;">
+  <!-- Name -->
+  <input id="waName" type="text" placeholder="Enter your name"
+         style="padding:6px; width:600px; border-radius:6px; border:1px solid #aaa; text-align:center;">
+
+  <!-- Number + Country Display -->
+<div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+    <input id="waNumber" type="text" placeholder="Enter phone number (e.g. 601170199170)"
+           style="padding:6px; width:600px; border-radius:6px; border:1px solid #aaa; text-align:center;">
+    <span id="countryDisplay" style="font-size:13px; color:#0b3d2e;">Malaysia</span>
+  </div>
 
   <!-- Message box -->
-  <textarea id="waMessage" rows="3" style="width:260px; padding:6px; border-radius:6px; border:1px solid #aaa;">
-Hi! I'm interested in your contact lenses promo.
-  </textarea>
+  <textarea id="waMessage" rows="4" style="width:600px; padding:6px; border-radius:6px; border:1px solid #aaa;"
+            placeholder="Type or select preset messages..."></textarea>
 
-  <!-- Send button -->
-  <button onclick="openWhatsApp()" style="padding:6px 12px; border-radius:6px; background:#0b3d2e; color:#fff; border:none; cursor:pointer;">
-    Open WhatsApp
-  </button>
+<!-- Preset buttons -->
+<div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px; max-width:600px;">
+<button type="button" onclick="addPersonalPreset()">Greetings!</button>
+
+  <button type="button" onclick="addPreset('Thank you for placing the order! We will text you once the contact lenses are ready!')">Contact Lenses Order</button>
 
 </div>
 
+
+  <!-- Undo / Redo -->
+  <div style="display:flex; gap:10px; margin-top:5px;">
+    <button type="button" onclick="undoMsg()">Undo</button>
+    <button type="button" onclick="redoMsg()">Redo</button>
+  </div>
+
+  <!-- Open WhatsApp -->
+  <button onclick="openWhatsApp()"
+          style="padding:6px 12px; border-radius:6px; height:40px; background:#0b3d2e; color:#fff; border:none; cursor:pointer; margin-top:10px;">
+    Open WhatsApp
+  </button>
+</div>
+
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const numberInput = document.getElementById("waNumber");
+  numberInput.addEventListener("input", updateCountryDisplay);
+});
+
+let history = [];
+let redoStack = [];
+
+/* === Undo / Redo Management === */
+function saveState() {
+  const msg = document.getElementById("waMessage").value;
+  history.push(msg);
+  if (history.length > 30) history.shift();
+  redoStack = [];
+}
+
+function addPreset(text) {
+  const box = document.getElementById("waMessage");
+  let current = box.value.trim();
+
+  saveState();
+
+  // Adds each preset on a new paragraph
+  if (!current) {
+    box.value = text;
+  } else {
+    box.value = `${current}\n\n${text}`;
+  }
+}
+
+// ✅ Separate function, not inside addPreset
+function addPersonalPreset() {
+  const nameInput = document.getElementById("waName").value.trim();
+  const name = capitalizeName(nameInput) || "there";
+  const message = `Greetings from Kiara Optometry! Thank you for dropping by ${name}.`;
+
+  addPreset(message);
+}
+
+
+
+function undoMsg() {
+  if (history.length === 0) return;
+  const box = document.getElementById("waMessage");
+  redoStack.push(box.value);
+  box.value = history.pop() || "";
+}
+
+function redoMsg() {
+  if (redoStack.length === 0) return;
+  const box = document.getElementById("waMessage");
+  history.push(box.value);
+  box.value = redoStack.pop();
+}
+
+/* === Name Formatting === */
+function capitalizeName(name) {
+  name = name.trim();
+  if (!name) return "";
+  return name
+    .split(/\s+/) // split by spaces
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+}
+
+
+/* === Country Flag & Name Display === */
+document.addEventListener("DOMContentLoaded", () => {
+  const numberInput = document.getElementById("waNumber");
+  numberInput.addEventListener("input", updateCountryDisplay);
+});
+
+/* === Country Flag & Name Display === */
+function detectCountry(num) {
+  const countries = [
+    // --- SE Asia ---
+{ code: "60", name: "Malaysia" },
+{ code: "65", name: "Singapore" },
+{ code: "62", name: "Indonesia" },
+{ code: "63", name: "Philippines" },
+{ code: "66", name: "Thailand" },
+{ code: "84", name: "Vietnam" },
+{ code: "673", name: "Brunei" },
+{ code: "95", name: "Myanmar" },
+{ code: "856", name: "Laos" },
+
+// --- East Asia ---
+{ code: "81", name: "Japan" },
+{ code: "82", name: "South Korea" },
+{ code: "86", name: "China" },
+{ code: "852", name: "Hong Kong" },
+{ code: "853", name: "Macau" },
+{ code: "886", name: "Taiwan" },
+
+// --- South Asia ---
+{ code: "91", name: "India" },
+{ code: "92", name: "Pakistan" },
+{ code: "94", name: "Sri Lanka" },
+{ code: "880", name: "Bangladesh" },
+{ code: "977", name: "Nepal" },
+
+// --- Oceania ---
+{ code: "61", name: "Australia" },
+{ code: "64", name: "New Zealand" },
+{ code: "687", name: "New Caledonia" },
+
+// --- Middle East ---
+{ code: "971", name: "UAE" },
+{ code: "966", name: "Saudi Arabia" },
+{ code: "965", name: "Kuwait" },
+{ code: "968", name: "Oman" },
+{ code: "973", name: "Bahrain" },
+{ code: "974", name: "Qatar" },
+{ code: "962", name: "Jordan" },
+
+// --- Africa ---
+{ code: "27", name: "South Africa" },
+{ code: "234", name: "Nigeria" },
+{ code: "254", name: "Kenya" },
+{ code: "255", name: "Tanzania" },
+{ code: "256", name: "Uganda" },
+{ code: "263", name: "Zimbabwe" },
+{ code: "20", name: "Egypt" },
+
+// --- Europe ---
+{ code: "44", name: "United Kingdom" },
+{ code: "33", name: "France" },
+{ code: "49", name: "Germany" },
+{ code: "34", name: "Spain" },
+{ code: "39", name: "Italy" },
+{ code: "31", name: "Netherlands" },
+{ code: "32", name: "Belgium" },
+{ code: "36", name: "Hungary" },
+{ code: "43", name: "Austria" },
+{ code: "41", name: "Switzerland" },
+{ code: "46", name: "Sweden" },
+{ code: "47", name: "Norway" },
+{ code: "45", name: "Denmark" },
+{ code: "351", name: "Portugal" },
+{ code: "420", name: "Czech Republic" },
+{ code: "421", name: "Slovakia" },
+{ code: "48", name: "Poland" },
+{ code: "358", name: "Finland" },
+{ code: "40", name: "Romania" },
+{ code: "30", name: "Greece" },
+{ code: "385", name: "Croatia" },
+{ code: "386", name: "Slovenia" },
+{ code: "372", name: "Estonia" },
+{ code: "371", name: "Latvia" },
+{ code: "370", name: "Lithuania" },
+{ code: "353", name: "Ireland" },
+
+// --- Americas ---
+{ code: "1", name: "United States / Canada" },
+{ code: "55", name: "Brazil" },
+{ code: "54", name: "Argentina" },
+{ code: "57", name: "Colombia" },
+{ code: "51", name: "Peru" },
+{ code: "56", name: "Chile" },
+{ code: "58", name: "Venezuela" }
+
+  ];
+
+  num = num.trim().replace(/[^\d+]/g, "");
+  if (num.startsWith("+")) num = num.slice(1);
+  if (num.startsWith("0")) num = "6" + num;
+
+  let match = countries.find(c => num.startsWith(c.code));
+  if (!num) return { flag: "🌍", name: "Enter number" };
+  return match || { flag: "🌍", name: "Unknown Country" };
+}
+
+function updateCountryDisplay() {
+  const num = document.getElementById("waNumber").value;
+  const info = detectCountry(num);
+  const display = document.getElementById("countryDisplay");
+  display.textContent = info.name; 
+}
+
+/* === Country Code Formatter === */
+function formatPhone(num) {
+  num = num.trim().replace(/[^\d+]/g, "");
+  if (num.startsWith("+")) num = num.slice(1);
+  if (num.startsWith("0")) return "6" + num;
+  return num.startsWith("60") ? num : "60" + num;
+}
+
+/* === WhatsApp Link Builder === */
 function openWhatsApp() {
-  const num = document.getElementById("waNumber").value.trim();
+  let name = document.getElementById("waName").value.trim();
+  let num = document.getElementById("waNumber").value.trim();
   const msg = document.getElementById("waMessage").value.trim();
+
   if (!num) return alert("Please enter a phone number");
-  if (!msg) return alert("Please enter a message");
+
+  name = capitalizeName(name);
+  document.getElementById("waName").value = name;
+
+  num = formatPhone(num);
+  document.getElementById("waNumber").value = num;
 
   const url = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 }
+
 </script>
+
+
+
+
+
+
+<div style="height:200px"></div>
+
 
 
 <h1> Search your Lenses below! <button id="scaleToggle">
@@ -1428,7 +1653,6 @@ btn.addEventListener('click', () => {
 
 
 </html>
-
 
 
 
