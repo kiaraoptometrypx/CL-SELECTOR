@@ -197,9 +197,8 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
 
 <div style="text-align:center; margin-top:20px;">
-  <h3 style="font-size:14px; margin-bottom:12px;">Prescription Entry</h3>
 
-  <table border="1" style="border-collapse:collapse; margin:auto; text-align:center; font-size:13px;">
+  <table border="1" style="border-collapse:collapse; margin:auto; text-align:center; font-size:12px;">
     <thead style="background:#f2f2f2;">
       <tr>
         <th style="padding:10px 20px;">Eye</th>
@@ -210,11 +209,11 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
     </thead>
     <tbody>
       <tr>
-        <td style="padding:12px 20px; font-weight:600;">Right (R)</td>
+        <td style="padding:12px 20px; font-weight:400;">Right (R)</td>
 
         <td style="padding:12px;">
           <input id="rSph" type="number" step="0.25" value="0.00"
-                 style="width:80px; text-align:center; margin-bottom:12px;"><br>
+                 style="width:120px; text-align:center; margin-bottom:12px;"><br>
           <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
             <div style="display:flex; gap:12px;">
               <button onclick="adjustSingle('r','sph',-1)" style="background:#c62828; color:white;">−1.00</button>
@@ -229,7 +228,7 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
         <td style="padding:12px;">
           <input id="rCyl" type="number" step="0.25" value="0.00"
-                 style="width:80px; text-align:center; margin-bottom:12px;"><br>
+                 style="width:120px; text-align:center; margin-bottom:12px;"><br>
           <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
             <div style="display:flex; gap:12px;">
               <button onclick="adjustSingle('r','cyl',-1)" style="background:#c62828; color:white;">−1.00</button>
@@ -244,7 +243,7 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
         <td style="padding:12px;">
           <input id="rAxis" type="number" step="1" value="0"
-                 style="width:80px; text-align:center; margin-bottom:12px;"><br>
+                 style="width:120px; text-align:center; margin-bottom:12px;"><br>
           <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
             <div style="display:flex; gap:12px;">
               <button onclick="adjustSingle('r','axis',-20)" style="background:#c62828; color:white;">−20°</button>
@@ -263,7 +262,7 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
         <td style="padding:12px;">
           <input id="lSph" type="number" step="0.25" value="0.00"
-                 style="width:80px; text-align:center; margin-bottom:12px;"><br>
+                 style="width:120px; text-align:center; margin-bottom:12px;"><br>
           <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
             <div style="display:flex; gap:12px;">
               <button onclick="adjustSingle('l','sph',-1)" style="background:#c62828; color:white;">−1.00</button>
@@ -278,7 +277,7 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
         <td style="padding:12px;">
           <input id="lCyl" type="number" step="0.25" value="0.00"
-                 style="width:80px; text-align:center; margin-bottom:12px;"><br>
+                 style="width:120px; text-align:center; margin-bottom:12px;"><br>
           <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
             <div style="display:flex; gap:12px;">
               <button onclick="adjustSingle('l','cyl',-1)" style="background:#c62828; color:white;">−1.00</button>
@@ -293,7 +292,7 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
         <td style="padding:12px;">
           <input id="lAxis" type="number" step="1" value="0"
-                 style="width:80px; text-align:center; margin-bottom:12px;"><br>
+                 style="width:120px; text-align:center; margin-bottom:12px;"><br>
           <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
             <div style="display:flex; gap:12px;">
               <button onclick="adjustSingle('l','axis',-20)" style="background:#c62828; color:white;">−20°</button>
@@ -311,7 +310,7 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
   <div style="margin-top:20px;">
     <button type="button" onclick="addRxToMessage()" 
-            style="padding:8px 16px; border-radius:6px; background:#0b3d2e; color:#fff; border:none; cursor:pointer; font-size:13px;">
+            style="padding:8px 16px; border-radius:10px; background:#0b3d2e; color:#fff; border:none; cursor:pointer; font-size:13px;">
       Add RX to Message
     </button>
   </div>
@@ -335,18 +334,31 @@ function adjustSingle(eye, type, value) {
 
 function addRxToMessage() {
   const rSph = parseFloat(document.getElementById("rSph").value).toFixed(2);
-  const rCyl = parseFloat(document.getElementById("rCyl").value).toFixed(2);
-  let rAxis = parseInt(document.getElementById("rAxis").value);
-  if (rAxis === 0) rAxis = 180;
-
+  const rCylVal = parseFloat(document.getElementById("rCyl").value).toFixed(2);
   const lSph = parseFloat(document.getElementById("lSph").value).toFixed(2);
-  const lCyl = parseFloat(document.getElementById("lCyl").value).toFixed(2);
+  const lCylVal = parseFloat(document.getElementById("lCyl").value).toFixed(2);
+
+  let rAxis = parseInt(document.getElementById("rAxis").value);
   let lAxis = parseInt(document.getElementById("lAxis").value);
-  if (lAxis === 0) lAxis = 180;
+
+  if (rCylVal == 0) {
+    rAxis = "-";
+  } else if (rAxis === 0) {
+    rAxis = 180;
+  }
+
+  if (lCylVal == 0) {
+    lAxis = "-";
+  } else if (lAxis === 0) {
+    lAxis = 180;
+  }
+
+  const rCyl = rCylVal == 0 ? "-" : rCylVal;
+  const lCyl = lCylVal == 0 ? "-" : lCylVal;
 
   const rxText =
-    `R :  ${rSph}  / ${rCyl} × ${rAxis}°\n` +
-    `L :  ${lSph}  / ${lCyl} × ${lAxis}°`;
+    `R :  ${rSph} /  ${rCyl} × ${rAxis}\n` +
+    `L :  ${lSph} /  ${lCyl} × ${lAxis}`;
 
   addPreset(rxText);
 }
@@ -360,7 +372,7 @@ function addRxToMessage() {
 
 
 </div>
-
+<div style="text-align:center; margin-top:20px; display:flex; flex-direction:column; align-items:center; gap:10px;">
 
   <!-- Undo / Redo -->
   <div style="display:flex; gap:10px; margin-top:5px;">
@@ -418,20 +430,22 @@ function addPersonalPreset() {
 
 
 function addSet(setName) {
-  const prices = { A: 190, B: 220, C: 280, D: 350 };
-  const price = prices[setName] || 0;
+  const sets = {
+    A: { label: "Set A - Vita Monthly Normal", price: 190 },
+    B: { label: "Set B - Vita Monthly Astig", price: 220 },
+    C: { label: "Set C - Oasys Biweekly Normal", price: 280 },
+    D: { label: "Set D - Oasys Biweekly Astig", price: 350 }
+  };
+
   const box = document.getElementById("waMessage");
-  let current = box.value.trim();
+  const current = box.value.trim();
+  const set = sets[setName];
+  if (!set) return;
 
-  saveState();
-
-  // ⚡ No extra blank line for sets
-  if (!current) {
-    box.value = `Set ${setName} — RM${price}`;
-  } else {
-    box.value = `${current}\nSet ${setName} — RM${price}`;
-  }
+  const newLine = current ? "\n" : "";
+  box.value = `${current}${newLine}${set.label} - RM${set.price}`;
 }
+
 
 
 // --- Total Up (only show Grand Total) ---
