@@ -132,20 +132,16 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 <div style="height:20px"></div>
   <div style="display:flex; flex-direction:column; align-items:center; gap:10px; margin:20px 0;">
 
-    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL_SPEC_PROMO1.png"
+    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/1.png"
          style="width:90%; border-radius:5px;">
-    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL_SPEC_PROMO2.png"
+    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/2.png"
          style="width:90%; border-radius:5px;">
-    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/CL_SPEC_PROMO3.png"
+    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/3.png"
+         style="width:90%; border-radius:5px;">
+    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/4.png"
          style="width:90%; border-radius:5px;">
 
 
-<div style="height:20px"></div>
-
-
-  <span style="display:inline-block; width:90%; text-align:center;">
-    These are photochromic lenses; they change colour when exposed to the sun (UV light).
-  </span>
 
 <div style="display:flex; flex-direction:column; align-items:center;">
   <video controls style="width:90%; height:350px; border-radius:5px;">
@@ -154,46 +150,57 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
 
 </div>
-
-
-  </div>
-</div>
-
+    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/5.png"
+         style="width:90%; border-radius:5px;">
 
 
 
-<div style="height:200px"></div>
+
+
+
+
+<div style="height:20px"></div>
 
 </div>
 
 
 
 <div style="text-align:center; margin-top:20px; display:flex; flex-direction:column; align-items:center; gap:10px;">
+<span>Place your order here!</span>
+<div style="text-align:center; margin-top:20px; display:flex; flex-direction:column; align-items:center; gap:12px; width:100%;">
 
   <!-- Name -->
-  <input id="waName" type="text" placeholder="Enter name"
-         style="padding:6px; width:600px; border-radius:6px; border:1px solid #aaa; text-align:center;">
+  <input id="waName" type="text"
+         placeholder="Enter name"
+         style="padding:6px; width:90%; border-radius:6px; border:1px solid #aaa; text-align:center;">
 
   <!-- Number + Country Display -->
-<div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
-    <input id="waNumber" type="text" placeholder="Enter WHATSAPP number with country code (e.g. 601170199170)"
-           style="padding:6px; width:600px; border-radius:6px; border:1px solid #aaa; text-align:center;">
+  <div style="display:flex; flex-direction:column; align-items:center; gap:4px; width:100%;">
+    <input id="waNumber" type="text"
+           placeholder="Enter WHATSAPP number with country code (e.g. 601170199170)"
+           style="padding:6px; width:90%; border-radius:6px; border:1px solid #aaa; text-align:center;">
     <span id="countryDisplay" style="font-size:13px; color:#0b3d2e;">Malaysia</span>
   </div>
 
   <!-- Message box -->
-  <textarea id="waMessage" rows="4" style="width:600px; padding:6px; border-radius:6px; border:1px solid #aaa;"
-            placeholder="Type or select preset messages..."></textarea>
+  <textarea id="waMessage" rows="4"
+            placeholder="Type or select preset messages..."
+            style="width:90%; padding:6px; border-radius:6px; border:1px solid #aaa;"></textarea>
 
-<!-- Preset buttons -->
-<div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px; max-width:600px;">
-  <button type="button" onclick="addPersonalPreset()">Greetings!</button>
-  <button type="button" onclick="addPreset('Thank you for placing the order! We will text you once the contact lenses are ready!')">Contact Lenses Order</button>
-  <button type="button" onclick="addSet('A')">Set A</button>
-  <button type="button" onclick="addSet('B')">Set B</button>
-  <button type="button" onclick="addSet('C')">Set C</button>
-  <button type="button" onclick="addSet('D')">Set D</button>
-  <button type="button" onclick="totalUp()">Total Up</button>
+  <!-- Preset buttons -->
+  <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; max-width:600px; margin-top:6px;">
+    <button type="button" onclick="addPersonalPreset()">Greetings!</button>
+    <button type="button" onclick="addPreset('Thank you for placing the order! We will text you once the contact lenses are ready!')">
+      Contact Lenses Order
+    </button>
+    <button type="button" onclick="addSet('A')">Set A</button>
+    <button type="button" onclick="addSet('B')">Set B</button>
+    <button type="button" onclick="addSet('C')">Set C</button>
+    <button type="button" onclick="addSet('D')">Set D</button>
+    <button type="button" onclick="totalUp()">Total Up</button>
+  </div>
+
+</div>
 
 
 <div style="text-align:center; margin-top:20px;">
@@ -309,11 +316,14 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
   </table>
 
   <div style="margin-top:20px;">
-    <button type="button" onclick="addRxToMessage()" 
-            style="padding:8px 16px; border-radius:10px; background:#0b3d2e; color:#fff; border:none; cursor:pointer; font-size:13px;">
+    <button type="button" onclick="addRxToMessage()">
       Add RX to Message
     </button>
-  </div>
+
+  <button type="button" onclick="clearRx()">
+    Clear RX
+  </button>
+
 </div>
 
 <script>
@@ -362,6 +372,13 @@ function addRxToMessage() {
 
   addPreset(rxText);
 }
+
+function clearRx() {
+  const fields = ["rSph", "rCyl", "rAxis", "lSph", "lCyl", "lAxis"];
+  fields.forEach(id => document.getElementById(id).value = id.includes("Axis") ? 0 : "0.00");
+}
+
+
 </script>
 
 
@@ -378,13 +395,12 @@ function addRxToMessage() {
   <div style="display:flex; gap:10px; margin-top:5px;">
     <button type="button" onclick="undoMsg()">Undo Message</button>
     <button type="button" onclick="redoMsg()">Redo Message</button>
-  </div>
 
   <!-- Open WhatsApp -->
-  <button onclick="openWhatsApp()"
-          style="padding:6px 12px; border-radius:6px; height:40px; background:#0b3d2e; color:#fff; border:none; cursor:pointer; margin-top:10px;">
+  <button onclick="openWhatsApp()" style="background: #f5f5b5; color:black; border: 1px solid black">
     Open WhatsApp
   </button>
+</div>
 </div>
 
 <script>
@@ -636,8 +652,8 @@ function openWhatsApp() {
 }
 
 </script>
-
-
+</div>
+</div>
 
 
 
