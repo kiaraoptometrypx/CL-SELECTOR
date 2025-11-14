@@ -185,7 +185,7 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
   <!-- Message box -->
   <textarea id="waMessage" rows="4"
             placeholder="Type or select preset messages..."
-            style="width:90%; padding:6px; border-radius:6px; border:1px solid #aaa;"></textarea>
+            style="width:90%; padding:6px; height:200px; border-radius:6px; border:1px solid #aaa;"></textarea>
 
   <!-- Preset buttons -->
   <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; max-width:600px; margin-top:6px;">
@@ -204,116 +204,115 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
 
 <div style="text-align:center; margin-top:20px;">
+<table style="width:90%; border:none; border-collapse:collapse; margin:auto; text-align:center; font-size:12px;">
+  <thead style="background:#f2f2f2;">
+    <tr>
+      <th style="padding:10px 20px; border:none;">Eye</th>
+      <th style="padding:10px 20px; border:none;">SPH</th>
+      <th style="padding:10px 20px; border:none;">CYL</th>
+      <th style="padding:10px 20px; border:none;">AXIS</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:12px 20px; font-weight:400; border:none;">Right (R)</td>
 
-  <table border="1" style="border-collapse:collapse; margin:auto; text-align:center; font-size:12px;">
-    <thead style="background:#f2f2f2;">
-      <tr>
-        <th style="padding:10px 20px;">Eye</th>
-        <th style="padding:10px 20px;">SPH</th>
-        <th style="padding:10px 20px;">CYL</th>
-        <th style="padding:10px 20px;">AXIS</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="padding:12px 20px; font-weight:400;">Right (R)</td>
-
-        <td style="padding:12px;">
-          <input id="rSph" type="number" step="0.25" value="0.00"
-                 style="width:120px; text-align:center; margin-bottom:12px;"><br>
-          <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-            <div style="display:flex; gap:12px;">
-              <button onclick="adjustSingle('r','sph',-1)" style="background:#c62828; color:white;">−1.00</button>
-              <button onclick="adjustSingle('r','sph',+1)" style="background:black; color:white;">+1.00</button>
-            </div>
-            <div style="display:flex; gap:12px;">
-              <button onclick="adjustSingle('r','sph',-0.25)" style="background:#c62828; color:white;">−0.25</button>
-              <button onclick="adjustSingle('r','sph',+0.25)" style="background:black; color:white;">+0.25</button>
-            </div>
+      <td style="padding:12px; border:none;">
+        <input id="rSph" type="number" step="0.25" value="0.00"
+               style="width:120px; text-align:center; margin-bottom:12px;"><br>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('r','sph',-1)" style="background:#c62828; color:white;">−1.00</button>
+            <button onclick="adjustSingle('r','sph',+1)" style="background:black; color:white;">+1.00</button>
           </div>
-        </td>
-
-        <td style="padding:12px;">
-          <input id="rCyl" type="number" step="0.25" value="0.00"
-                 style="width:120px; text-align:center; margin-bottom:12px;"><br>
-          <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-            <div style="display:flex; gap:12px;">
-              <button onclick="adjustSingle('r','cyl',-1)" style="background:#c62828; color:white;">−1.00</button>
-              <button onclick="adjustSingle('r','cyl',+1)" style="background:black; color:white;">+1.00</button>
-            </div>
-            <div style="display:flex; gap:12px;">
-              <button onclick="adjustSingle('r','cyl',-0.25)" style="background:#c62828; color:white;">−0.25</button>
-              <button onclick="adjustSingle('r','cyl',+0.25)" style="background:black; color:white;">+0.25</button>
-            </div>
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('r','sph',-0.25)" style="background:#c62828; color:white;">−0.25</button>
+            <button onclick="adjustSingle('r','sph',+0.25)" style="background:black; color:white;">+0.25</button>
           </div>
-        </td>
+        </div>
+      </td>
 
-        <td style="padding:12px;">
-          <input id="rAxis" type="number" step="1" value="0"
-                 style="width:120px; text-align:center; margin-bottom:12px;"><br>
-          <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-            <div style="display:flex; gap:12px;">
-              <button onclick="adjustSingle('r','axis',-20)" style="background:#c62828; color:white;">−20°</button>
-              <button onclick="adjustSingle('r','axis',+20)" style="background:black; color:white;">+20°</button>
-            </div>
-            <div style="display:flex; gap:12px;">
-              <button onclick="adjustSingle('r','axis',-5)" style="background:#c62828; color:white;">−5°</button>
-              <button onclick="adjustSingle('r','axis',+5)" style="background:black; color:white;">+5°</button>
-            </div>
+      <td style="padding:12px; border:none;">
+        <input id="rCyl" type="number" step="0.25" value="0.00"
+               style="width:120px; text-align:center; margin-bottom:12px;"><br>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('r','cyl',-1)" style="background:#c62828; color:white;">−1.00</button>
+            <button onclick="adjustSingle('r','cyl',+1)" style="background:black; color:white;">+1.00</button>
           </div>
-        </td>
-      </tr>
-
-      <tr>
-        <td style="padding:12px 20px; font-weight:600;">Left (L)</td>
-
-        <td style="padding:12px;">
-          <input id="lSph" type="number" step="0.25" value="0.00"
-                 style="width:120px; text-align:center; margin-bottom:12px;"><br>
-          <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-            <div style="display:flex; gap:12px;">
-              <button onclick="adjustSingle('l','sph',-1)" style="background:#c62828; color:white;">−1.00</button>
-              <button onclick="adjustSingle('l','sph',+1)" style="background:black; color:white;">+1.00</button>
-            </div>
-            <div style="display:flex; gap:12px;">
-              <button onclick="adjustSingle('l','sph',-0.25)" style="background:#c62828; color:white;">−0.25</button>
-              <button onclick="adjustSingle('l','sph',+0.25)" style="background:black; color:white;">+0.25</button>
-            </div>
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('r','cyl',-0.25)" style="background:#c62828; color:white;">−0.25</button>
+            <button onclick="adjustSingle('r','cyl',+0.25)" style="background:black; color:white;">+0.25</button>
           </div>
-        </td>
+        </div>
+      </td>
 
-        <td style="padding:12px;">
-          <input id="lCyl" type="number" step="0.25" value="0.00"
-                 style="width:120px; text-align:center; margin-bottom:12px;"><br>
-          <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-            <div style="display:flex; gap:12px;">
-              <button onclick="adjustSingle('l','cyl',-1)" style="background:#c62828; color:white;">−1.00</button>
-              <button onclick="adjustSingle('l','cyl',+1)" style="background:black; color:white;">+1.00</button>
-            </div>
-            <div style="display:flex; gap:12px;">
-              <button onclick="adjustSingle('l','cyl',-0.25)" style="background:#c62828; color:white;">−0.25</button>
-              <button onclick="adjustSingle('l','cyl',+0.25)" style="background:black; color:white;">+0.25</button>
-            </div>
+      <td style="padding:12px; border:none;">
+        <input id="rAxis" type="number" step="1" value="0"
+               style="width:120px; text-align:center; margin-bottom:12px;"><br>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('r','axis',-20)" style="background:#c62828; color:white;">−20°</button>
+            <button onclick="adjustSingle('r','axis',+20)" style="background:black; color:white;">+20°</button>
           </div>
-        </td>
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('r','axis',-5)" style="background:#c62828; color:white;">−5°</button>
+            <button onclick="adjustSingle('r','axis',+5)" style="background:black; color:white;">+5°</button>
+          </div>
+        </div>
+      </td>
+    </tr>
 
-        <td style="padding:12px;">
-          <input id="lAxis" type="number" step="1" value="0"
-                 style="width:120px; text-align:center; margin-bottom:12px;"><br>
-          <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
-            <div style="display:flex; gap:12px;">
-              <button onclick="adjustSingle('l','axis',-20)" style="background:#c62828; color:white;">−20°</button>
-              <button onclick="adjustSingle('l','axis',+20)" style="background:black; color:white;">+20°</button>
-            </div>
-            <div style="display:flex; gap:12px;">
-              <button onclick="adjustSingle('l','axis',-5)" style="background:#c62828; color:white;">−5°</button>
-              <button onclick="adjustSingle('l','axis',+5)" style="background:black; color:white;">+5°</button>
-            </div>
+    <tr>
+      <td style="padding:12px 20px; font-weight:600; border:none;">Left (L)</td>
+
+      <td style="padding:12px; border:none;">
+        <input id="lSph" type="number" step="0.25" value="0.00"
+               style="width:120px; text-align:center; margin-bottom:12px;"><br>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('l','sph',-1)" style="background:#c62828; color:white;">−1.00</button>
+            <button onclick="adjustSingle('l','sph',+1)" style="background:black; color:white;">+1.00</button>
           </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('l','sph',-0.25)" style="background:#c62828; color:white;">−0.25</button>
+            <button onclick="adjustSingle('l','sph',+0.25)" style="background:black; color:white;">+0.25</button>
+          </div>
+        </div>
+      </td>
+
+      <td style="padding:12px; border:none;">
+        <input id="lCyl" type="number" step="0.25" value="0.00"
+               style="width:120px; text-align:center; margin-bottom:12px;"><br>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('l','cyl',-1)" style="background:#c62828; color:white;">−1.00</button>
+            <button onclick="adjustSingle('l','cyl',+1)" style="background:black; color:white;">+1.00</button>
+          </div>
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('l','cyl',-0.25)" style="background:#c62828; color:white;">−0.25</button>
+            <button onclick="adjustSingle('l','cyl',+0.25)" style="background:black; color:white;">+0.25</button>
+          </div>
+        </div>
+      </td>
+
+      <td style="padding:12px; border:none;">
+        <input id="lAxis" type="number" step="1" value="0"
+               style="width:120px; text-align:center; margin-bottom:12px;"><br>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('l','axis',-20)" style="background:#c62828; color:white;">−20°</button>
+            <button onclick="adjustSingle('l','axis',+20)" style="background:black; color:white;">+20°</button>
+          </div>
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('l','axis',-5)" style="background:#c62828; color:white;">−5°</button>
+            <button onclick="adjustSingle('l','axis',+5)" style="background:black; color:white;">+5°</button>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
   <div style="margin-top:20px;">
     <button type="button" onclick="addRxToMessage()">
@@ -401,6 +400,8 @@ function clearRx() {
     Open WhatsApp
   </button>
 </div>
+
+<div style="height:10px"></div>
 </div>
 
 <script>
