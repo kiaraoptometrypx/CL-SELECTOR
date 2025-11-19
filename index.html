@@ -613,7 +613,6 @@ function detectCountry(num) {
 
   num = num.trim().replace(/[^\d+]/g, "");
   if (num.startsWith("+")) num = num.slice(1);
-  if (num.startsWith("0")) num = "6" + num;
 
   let match = countries.find(c => num.startsWith(c.code));
   if (!num) return { flag: "🌍", name: "Enter number" };
@@ -629,11 +628,9 @@ function updateCountryDisplay() {
 
 /* === Country Code Formatter === */
 function formatPhone(num) {
-  num = num.trim().replace(/[^\d+]/g, "");
-  if (num.startsWith("+")) num = num.slice(1);
-  if (num.startsWith("0")) return "6" + num;
-  return num.startsWith("60") ? num : "60" + num;
+  return num.trim().replace(/[^\d]/g, "");
 }
+
 
 /* === WhatsApp Link Builder === */
 function openWhatsApp() {
@@ -1916,6 +1913,7 @@ btn.addEventListener('click', () => {
 
 
 </html>
+
 
 
 
