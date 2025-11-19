@@ -613,6 +613,8 @@ function detectCountry(num) {
 
   num = num.trim().replace(/[^\d+]/g, "");
   if (num.startsWith("+")) num = num.slice(1);
+  if (num.startsWith("0")) num = "6" + num;
+
 
   let match = countries.find(c => num.startsWith(c.code));
   if (!num) return { flag: "🌍", name: "Enter number" };
@@ -1913,6 +1915,7 @@ btn.addEventListener('click', () => {
 
 
 </html>
+
 
 
 
