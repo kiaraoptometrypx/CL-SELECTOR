@@ -613,7 +613,6 @@ function detectCountry(num) {
 
   num = num.trim().replace(/[^\d+]/g, "");
   if (num.startsWith("+")) num = num.slice(1);
-  if (num.startsWith("0")) num = "6" + num;
 
 
   let match = countries.find(c => num.startsWith(c.code));
@@ -628,10 +627,30 @@ function updateCountryDisplay() {
   display.textContent = info.name; 
 }
 
-/* === Country Code Formatter === */
 function formatPhone(num) {
-  return num.trim().replace(/[^\d]/g, "");
+  num = num.trim();
+
+  // If starts with +, remove it BEFORE stripping non-digits
+  if (num.startsWith("+")) num = num.slice(1);
+
+  // Remove everything except digits
+  num = num.replace(/[^\d]/g, "");
+
+  // If user types 0xxxx... → treat as Malaysia
+  if (num.startsWith("0")) {
+    return "6" + num;  // 017 → 6017
+  }
+
+  // If starts with 60 → already Malaysia
+  if (num.startsWith("60")) {
+    return num;
+  }
+
+  // Otherwise foreign number → leave as is
+  return num;
 }
+
+
 
 
 /* === WhatsApp Link Builder === */
@@ -1915,6 +1934,7 @@ btn.addEventListener('click', () => {
 
 
 </html>
+
 
 
 
