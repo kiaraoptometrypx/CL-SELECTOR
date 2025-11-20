@@ -1554,6 +1554,10 @@ document.addEventListener('DOMContentLoaded',function(){
 
   function glassesToCL(F){ const d=0.01; return F/(1 - d*F); }
   function r025(x){ return Math.round(x/0.25)*0.25; }
+function roundUp025(x){
+  return Math.ceil(x / 0.25) * 0.25;
+}
+
   function fmt(x){ x=parseFloat(x)||0; const v=Math.round(x*100)/100; const s=v>=0?"+":""; return s+v.toFixed(2); }
   function nearest(arr,val){ return arr.reduce((b,v)=>Math.abs(v-val)<Math.abs(b-val)?v:b,arr[0]); }
   function roundDown025(x){ return Math.floor(x/0.25)*0.25; }
@@ -1593,29 +1597,56 @@ function flatterAxis(a){
 }
 
 
-  function convertOne(S,C,A){
-    S=parseFloat(S)||0; C=parseFloat(C)||0; A=parseFloat(A)||0;
-    const total=S+C;
-    const convS=glassesToCL(S);
-    const convT=glassesToCL(total);
-    const newC=convT-convS;
-    const SE=convS+newC/2;
-    const rS=r025(convS);
-    const rC=nearest(CL_CYL_STEPS,newC);
-    const [axis1,axis2]=flatterAxis(A);
+// NEW rounding rule
+function roundClipDiff(x){
+  if (x >= -0.25) return 0;
+  return Math.floor(x / 0.50) * 0.50;
+}
 
-    if(Math.abs(newC)<0.75){
-      return { type:"sph", sph:r025(SE), cyl:0, axis:null, SE:roundDown025(SE) };
-    }
+function convertOne(S, C, A) {
+  S = parseFloat(S) || 0;
+  C = parseFloat(C) || 0;
+  A = parseFloat(A) || 0;
 
-    const t1={S:rS,C:rC,A:axis1};
-    const t2={S:rS,C:rC,A:axis2};
-    let t3C=rC+0.5; if(t3C>-0.75)t3C=0;
-    const t3={S:rS-0.25,C:t3C,A:axis1};
-    const se=roundDown025(SE);
+  const total = S + C;
+  const convS = glassesToCL(S);
+  const convT = glassesToCL(total);
+  const rawCyl = convT - convS;
+  const SE = convS + rawCyl / 2;
 
-    return { type:"toric", t1,t2,t3,SE:se };
+  const rS = r025(convS);
+  const rClipC = nearest(CL_CYL_STEPS, rawCyl);
+  const [axis1, axis2] = flatterAxis(A);
+
+  // NEW logic
+  const clipDiffRounded = roundClipDiff(rawCyl - rClipC);
+  const correctedSphere = roundUp025(rS + clipDiffRounded / 2);
+
+  if (Math.abs(rawCyl) < 0.75) {
+    return {
+      type: "sph",
+      sph: roundUp025(SE),
+      cyl: 0,
+      axis: null
+    };
   }
+
+  return {
+    type: "toric",
+
+    t1: { S: correctedSphere, C: rClipC, A: axis1 },
+    t2: { S: correctedSphere, C: rClipC, A: axis2 },
+
+    t3: {
+      S: correctedSphere - 0.25,
+      C: Math.max(rClipC + 0.50, 0),
+      A: axis1
+    },
+
+    SE: roundUp025(SE)
+  };
+}
+
 
   function display(side,data){
     const div=document.getElementById(side==="re"?"reResult":"leResult");
@@ -1934,7 +1965,6 @@ btn.addEventListener('click', () => {
 
 
 </html>
-
 
 
 
