@@ -191,10 +191,10 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
     <button type="button" onclick="addPreset('Thank you for placing the order! We will text you once the contact lenses are ready!')">
       Contact Lenses Order
     </button>
-    <button type="button" onclick="addSet('A')">Set A</button>
-    <button type="button" onclick="addSet('B')">Set B</button>
-    <button type="button" onclick="addSet('C')">Set C</button>
-    <button type="button" onclick="addSet('D')">Set D</button>
+    <button type="button" onclick="addSet('A')">Vita Sph</button>
+    <button type="button" onclick="addSet('B')">Vita Astig</button>
+    <button type="button" onclick="addSet('C')">O2W Sph</button>
+    <button type="button" onclick="addSet('D')">O2W Astig</button>
     <button type="button" onclick="totalUp()">Total Up</button>
   </div>
 
@@ -449,10 +449,10 @@ function addPersonalPreset() {
 
 function addSet(setName) {
   const sets = {
-    A: { label: "Set A - Vita Monthly Normal", price: 190 },
-    B: { label: "Set B - Vita Monthly Astig", price: 220 },
-    C: { label: "Set C - Oasys Biweekly Normal", price: 280 },
-    D: { label: "Set D - Oasys Biweekly Astig", price: 350 }
+    A: { label: "Set - Vita Monthly Normal", price: 190 },
+    B: { label: "Set - Vita Monthly Astig", price: 220 },
+    C: { label: "Set - Oasys Biweekly Normal", price: 280 },
+    D: { label: "Set - Oasys Biweekly Astig", price: 350 }
   };
 
   const box = document.getElementById("waMessage");
