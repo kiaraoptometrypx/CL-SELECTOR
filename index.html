@@ -1630,6 +1630,10 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 </script>
 
+
+
+
+
 <script>
 /* =========================
    Converter (unchanged core)
@@ -1685,8 +1689,7 @@ function flatterAxis(a){
 
 // NEW rounding rule
 function roundClipDiff(x){
-  if (x >= -0.25) return 0;
-  return Math.floor(x / 0.50) * 0.50;
+  return Math.round(x/0.50)*0.50;
 }
 
 function convertOne(S, C, A) {
@@ -1723,11 +1726,13 @@ function convertOne(S, C, A) {
     t1: { S: correctedSphere, C: rClipC, A: axis1 },
     t2: { S: correctedSphere, C: rClipC, A: axis2 },
 
-    t3: {
-      S: correctedSphere - 0.25,
-      C: Math.max(rClipC + 0.50, 0),
-      A: axis1
-    },
+t3: {
+  S: correctedSphere - 0.25,
+  C: rClipC + 0.50,   // add +0.50 = more plus
+  A: axis1
+}
+
+
 
     SE: roundUp025(SE)
   };
@@ -1784,6 +1789,16 @@ function convertOne(S, C, A) {
   document.getElementById("autoSE").addEventListener("click",()=>autofillSet("SE"));
 })();
 </script>
+
+
+
+
+
+
+
+
+
+
 
 <script>
 /* =========================
@@ -2051,7 +2066,6 @@ btn.addEventListener('click', () => {
 
 
 </html>
-
 
 
 
