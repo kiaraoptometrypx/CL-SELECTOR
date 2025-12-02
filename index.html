@@ -2012,44 +2012,7 @@ buildCards = function(list){
 
 
 
-<script>
-let scaled = true; // start zoomed OUT
-const btn = document.getElementById('scaleToggle');
 
-window.addEventListener('load', () => {
-  const html = document.documentElement;
-  const body = document.body;
-  body.style.transform = 'scale(0.85)';
-  body.style.transformOrigin = 'top center';
-  body.style.margin = '0 auto';
-  body.style.width = '125%';
-  html.style.display = 'flex';
-  html.style.justifyContent = 'center';
-  btn.textContent = '🔎'; // show zoom-in icon
-});
-
-btn.addEventListener('click', () => {
-  const html = document.documentElement;
-  const body = document.body;
-  scaled = !scaled;
-
-  if (scaled) {
-    body.style.transform = 'scale(0.85)';
-    body.style.transformOrigin = 'top center';
-    body.style.margin = '0 auto';
-    body.style.width = '125%';
-    html.style.display = 'flex';
-    html.style.justifyContent = 'center';
-    btn.textContent = '🔎';
-  } else {
-    body.style.transform = 'scale(1)';
-    body.style.width = '100%';
-    html.style.display = '';
-    html.style.justifyContent = '';
-    btn.textContent = '🔍';
-  }
-});
-</script>
 
 
 
@@ -2079,6 +2042,7 @@ btn.addEventListener('click', () => {
 
 
 </html>
+
 
 
 
