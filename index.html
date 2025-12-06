@@ -2,26 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Kiara Optometry Contact Lens Search</title>
+<title>Contact Lens Selector</title>
 <meta name="viewport" content="width=device-width, initial-scale=1=" />
 <style>
-
-
-  #wrap1 {
-    width: 1000px;              /* your design’s real width */
-    margin: 0 auto;
-    transform-origin: top center;
-  }
-
-  @media (max-width: 1000px) {
-    #wrap1 {
-      transform: scale(calc(100vw / 1000));
-    }
-  }
-
-
-
-
 /* === Lightbox (shared) === */
 #imgZoom{position:fixed;inset:0;display:none;background:rgba(0,0,0,.75);align-items:center;justify-content:center;z-index:10000;cursor:zoom-out}
 #imgZoom.open{display:flex}
@@ -118,7 +101,7 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 </style>
 </head>
 <body>
-<div id="wrap1">
+
 <!-- 🔒 Locked screen -->
 <div style="font-size:10px" id="overlay">🔒 Entering password...</div>
 
@@ -133,17 +116,668 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
 <div style="height:200px"></div>
   <h1>
-    Kiara Optometry Contact Lens Search<br><br>
-
+    Kiara Optometry Contact Lens Selector<br><br>
+<span style="text-decoration:underline; cursor:pointer;"
+      onclick="document.getElementById('targetSection').scrollIntoView();">
+  Search Lenses Segment
+</span>
 
 
   </h1>
 
 
+
+<div style="height:200px"></div>
+
+<div class="wrap">
+
+
+
+<div class="section"
+     style="display:flex; flex-direction:column;
+            justify-content:center; align-items:center; width:100%;">
+
+
+<div class="section3" style="width:90%; height:auto; ">
+<h1>Current Promotions</h1>
+
+<div style="height:20px"></div>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:10px; margin:20px 0;">
+
+    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/1.png"
+         style="width:90%; border-radius:5px;">
+    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/2.png"
+         style="width:90%; border-radius:5px;">
+
+
+
+
+
+<div style="display:flex; flex-direction:column; align-items:center;">
+  <video controls style="width:90%; height:auto; border-radius:5px;">
+    <source src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/photochromic.mp4" type="video/mp4">
+  </video>
+
+
+</div>
+    <img src="https://raw.githubusercontent.com/kiaraoptometrypx/CL-SELECTOR/main/5.png"
+         style="width:90%; border-radius:5px;">
+
+
+</div>
+
+</div>
+
+
+
+
+<div style="text-align:center; margin-top:20px; display:flex; flex-direction:column; align-items:center; gap:10px;">
+<h1>Send a whatsapp text</h1>
+
+<div style="text-align:center; display:flex; flex-direction:column; align-items:center; gap:12px; width:100%;">
+
+  <!-- Name -->
+  <input id="waName" type="text"
+         placeholder="Enter name"
+         style="padding:6px; width:90%; border-radius:6px; border:1px solid #aaa; text-align:center;">
+
+  <!-- Number + Country Display -->
+  <div style="display:flex; flex-direction:column; align-items:center; gap:4px; width:100%;">
+    <input id="waNumber" type="text"
+           placeholder="Enter WHATSAPP number with country code (e.g. 601170199170)"
+           style="padding:6px; width:90%; border-radius:6px; border:1px solid #aaa; text-align:center;">
+    <span id="countryDisplay" style="font-size:13px; color:#0b3d2e;">Malaysia</span>
+
+</div>
+
+
+<div style="text-align:center; margin-top:20px;
+            display:flex; flex-direction:row; justify-content:center;
+            align-items:center; gap:10px;">
+
+    <button type="button" onclick="addPersonalPreset()">Greetings!</button>
+
+    <button type="button" onclick="undoMsg()">Undo Message</button>
+    <button type="button" onclick="redoMsg()">Redo Message</button>
+  <button onclick="openWhatsApp()" style="background: #f5f5b5; color:black; border: 1px solid black">
+    Open WhatsApp
+  </button>
+
+  </div>
+
+  <!-- Message box -->
+  <textarea id="waMessage" rows="4"
+            placeholder="Type or select preset messages..."
+            style="width:90%; padding:6px; height:120px; border-radius:6px; border:1px solid #aaa;"></textarea>
+
+<!-- Toggle button -->
+<div style="text-align:center; margin-top:10px;">
+  <button id="presetToggleBtn"
+          style="font-size:12px; color:black; background:#f5f5b5; border:1px solid #000;">
+    Show Presets
+  </button>
+</div>
+
+<!-- Buttons section (START HIDDEN) -->
+<div id="presetButtons" 
+     style="display:none; ">
+
+  <div style="display:flex; flex-wrap:wrap; justify-content:center; 
+              gap:8px; max-width:400px; margin-top:6px;">
+
+
+    <button type="button" onclick="addSet('A')">Vita Sph</button>
+    <button type="button" onclick="addSet('B')">Vita Astig</button>
+    <button type="button" onclick="addSet('C')">O2W Sph</button>
+    <button type="button" onclick="addSet('D')">O2W Astig</button>
+
+    <button type="button" onclick="addPreset('Thank you for placing the order! We will text you once the contact lenses are ready!')">
+      Place Order
+    </button>
+    <button type="button" onclick="totalUp()">Total Up</button>
+
+  </div>
+
+</div>
+
+
+<script>
+(function(){
+  const btn = document.getElementById("presetToggleBtn");
+  const box = document.getElementById("presetButtons");
+
+  let open = false; // start hidden
+
+  function render(){
+    box.style.display = open ? "block" : "none";
+    btn.textContent = open ? "Hide Place Order" : "Show Place Order";
+  }
+
+  btn.addEventListener("click", () => {
+    open = !open;
+    render();
+  });
+
+  render();
+})();
+</script>
+
+
+
+<!-- RX hide/show toggle -->
+<div style="text-align:center; margin:10px;">
+  <button type="button" id="rxSectionToggle"
+    style="font-size:12px;background:#f5f5b5;color:black;border:1px solid black;">
+    Hide RX
+  </button>
+</div>
+
+<!-- RX SECTION -->
+<div id="rxSection">
+  <div style="text-align:center; margin-bottom:10px">
+    <table style="width:90%; border:none; border-collapse:collapse; margin:auto; text-align:center; font-size:12px;">
+
+
+  <thead style="background:#d1d1d1;">
+    <tr>
+      <th style="padding:10px 20px; border:none;">Eye</th>
+      <th style="padding:10px 20px; border:none;">SPH</th>
+      <th style="padding:10px 20px; border:none;">CYL</th>
+      <th style="padding:10px 20px; border:none;">AXIS</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr style="height:5px"><td></td>
+</tr>
+    <tr style="background:#f5f5f5">
+      <td style="padding:12px 20px; font-weight:400; border:none;">Right (R)</td>
+
+      <td style="padding:12px; border:none;">
+        <input id="rSph" type="number" step="0.25" value="0.00"
+               style="width:120px; text-align:center; margin-bottom:12px;"><br>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('r','sph',-1)" style="background:#c62828; color:white;">−1.00</button>
+            <button onclick="adjustSingle('r','sph',+1)" style="background:black; color:white;">+1.00</button>
+          </div>
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('r','sph',-0.25)" style="background:#c62828; color:white;">−0.25</button>
+            <button onclick="adjustSingle('r','sph',+0.25)" style="background:black; color:white;">+0.25</button>
+          </div>
+        </div>
+      </td>
+
+      <td style="padding:12px; border:none;">
+        <input id="rCyl" type="number" step="0.25" value="0.00"
+               style="width:120px; text-align:center; margin-bottom:12px;"><br>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('r','cyl',-1)" style="background:#c62828; color:white;">−1.00</button>
+            <button onclick="adjustSingle('r','cyl',+1)" style="background:black; color:white;">+1.00</button>
+          </div>
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('r','cyl',-0.25)" style="background:#c62828; color:white;">−0.25</button>
+            <button onclick="adjustSingle('r','cyl',+0.25)" style="background:black; color:white;">+0.25</button>
+          </div>
+        </div>
+      </td>
+
+      <td style="padding:12px; border:none;">
+        <input id="rAxis" type="number" step="1" value="0"
+               style="width:120px; text-align:center; margin-bottom:12px;"><br>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('r','axis',-20)" style="background:#c62828; color:white;">−20°</button>
+            <button onclick="adjustSingle('r','axis',+20)" style="background:black; color:white;">+20°</button>
+          </div>
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('r','axis',-5)" style="background:#c62828; color:white;">−5°</button>
+            <button onclick="adjustSingle('r','axis',+5)" style="background:black; color:white;">+5°</button>
+          </div>
+        </div>
+      </td>
+    </tr>
+<tr style="height:5px"><td></td>
+</tr>
+    <tr style="background:#f5f5f5">
+      <td style="padding:12px 20px; font-weight:400; border:none;">Left (L)</td>
+
+      <td style="padding:12px; border:none;">
+        <input id="lSph" type="number" step="0.25" value="0.00"
+               style="width:120px; text-align:center; margin-bottom:12px;"><br>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('l','sph',-1)" style="background:#c62828; color:white;">−1.00</button>
+            <button onclick="adjustSingle('l','sph',+1)" style="background:black; color:white;">+1.00</button>
+          </div>
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('l','sph',-0.25)" style="background:#c62828; color:white;">−0.25</button>
+            <button onclick="adjustSingle('l','sph',+0.25)" style="background:black; color:white;">+0.25</button>
+          </div>
+        </div>
+      </td>
+
+      <td style="padding:12px; border:none;">
+        <input id="lCyl" type="number" step="0.25" value="0.00"
+               style="width:120px; text-align:center; margin-bottom:12px;"><br>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('l','cyl',-1)" style="background:#c62828; color:white;">−1.00</button>
+            <button onclick="adjustSingle('l','cyl',+1)" style="background:black; color:white;">+1.00</button>
+          </div>
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('l','cyl',-0.25)" style="background:#c62828; color:white;">−0.25</button>
+            <button onclick="adjustSingle('l','cyl',+0.25)" style="background:black; color:white;">+0.25</button>
+          </div>
+        </div>
+      </td>
+
+      <td style="padding:12px; border:none;">
+        <input id="lAxis" type="number" step="1" value="0"
+               style="width:120px; text-align:center; margin-bottom:12px;"><br>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('l','axis',-20)" style="background:#c62828; color:white;">−20°</button>
+            <button onclick="adjustSingle('l','axis',+20)" style="background:black; color:white;">+20°</button>
+          </div>
+          <div style="display:flex; gap:12px;">
+            <button onclick="adjustSingle('l','axis',-5)" style="background:#c62828; color:white;">−5°</button>
+            <button onclick="adjustSingle('l','axis',+5)" style="background:black; color:white;">+5°</button>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <div style="margin-top:20px;">
+    <button type="button" onclick="addRxToMessage()">
+      Add RX to Message
+    </button>
+
+  <button type="button" onclick="clearRx()">
+    Clear RX
+  </button>
+
+</div>
+</div>
+
+<script>
+(function(){
+  const btn = document.getElementById("rxSectionToggle");
+  const sec = document.getElementById("rxSection");
+  if(!btn || !sec) return;
+
+  let open =  false;
+
+  function render(){
+    sec.style.display = open ? "block" : "none";
+    btn.textContent = open ? "Hide RX Input Table" : "Show RX Input Table";
+  }
+
+  btn.addEventListener("click", () => {
+    open = !open;
+    render();
+  });
+
+  render();
+})();
+</script>
+
+
+<script>
+function adjustSingle(eye, type, value) {
+  const id = eye + type.charAt(0).toUpperCase() + type.slice(1);
+  const field = document.getElementById(id);
+
+  if (type === "axis") {
+    let newVal = parseInt(field.value) + value;
+    if (newVal <= 0) newVal += 180;
+    if (newVal > 180) newVal -= 180;
+    field.value = newVal === 0 ? 180 : newVal;
+  } else {
+    const newVal = (parseFloat(field.value) + value).toFixed(2);
+    field.value = newVal;
+  }
+}
+
+function addRxToMessage() {
+  const rSph = parseFloat(document.getElementById("rSph").value).toFixed(2);
+  const rCylVal = parseFloat(document.getElementById("rCyl").value).toFixed(2);
+  const lSph = parseFloat(document.getElementById("lSph").value).toFixed(2);
+  const lCylVal = parseFloat(document.getElementById("lCyl").value).toFixed(2);
+
+  let rAxis = parseInt(document.getElementById("rAxis").value);
+  let lAxis = parseInt(document.getElementById("lAxis").value);
+
+  if (rCylVal == 0) {
+    rAxis = "-";
+  } else if (rAxis === 0) {
+    rAxis = 180;
+  }
+
+  if (lCylVal == 0) {
+    lAxis = "-";
+  } else if (lAxis === 0) {
+    lAxis = 180;
+  }
+
+  const rCyl = rCylVal == 0 ? "-" : rCylVal;
+  const lCyl = lCylVal == 0 ? "-" : lCylVal;
+
+  const rxText =
+    `R :  ${rSph} /  ${rCyl} × ${rAxis}\n` +
+    `L :  ${lSph} /  ${lCyl} × ${lAxis}`;
+
+  addPreset(rxText);
+}
+
+function clearRx() {
+  const fields = ["rSph", "rCyl", "rAxis", "lSph", "lCyl", "lAxis"];
+  fields.forEach(id => document.getElementById(id).value = id.includes("Axis") ? 0 : "0.00");
+}
+
+
+</script>
+
+
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const numberInput = document.getElementById("waNumber");
+  numberInput.addEventListener("input", updateCountryDisplay);
+});
+
+let history = [];
+let redoStack = [];
+
+/* === Undo / Redo Management === */
+function saveState() {
+  const msg = document.getElementById("waMessage").value;
+  history.push(msg);
+  if (history.length > 30) history.shift();
+  redoStack = [];
+}
+
+function addPreset(text) {
+  const box = document.getElementById("waMessage");
+  let current = box.value.trim();
+
+  saveState();
+
+  // Adds each preset on a new paragraph
+  if (!current) {
+    box.value = text;
+  } else {
+    box.value = `${current}\n\n${text}`;
+  }
+}
+
+// ✅ Separate function, not inside addPreset
+function addPersonalPreset() {
+  const nameInput = document.getElementById("waName").value.trim();
+  const name = capitalizeName(nameInput) || "there";
+  const message = `Greetings from Kiara Optometry! Thank you for dropping by ${name}.`;
+
+  addPreset(message);
+}
+
+
+
+function addSet(setName) {
+  const sets = {
+    A: { label: "Set A - Vita Monthly Sph + 1 bottle Opti-free Puremoist 300ml", price: 190 },
+    B: { label: "Set B - Vita Monthly Astig + 1 bottle Opti-free Puremoist 300ml", price: 220 },
+    C: { label: "Set C - Oasys Biweekly Sph + 1 bottle Opti-free Puremoist 300ml", price: 280 },
+    D: { label: "Set D - Oasys Biweekly Astig + 1 bottle Opti-free Puremoist 300ml", price: 350 }
+  };
+
+  const box = document.getElementById("waMessage");
+  const current = box.value.trim();
+  const set = sets[setName];
+  if (!set) return;
+
+  const newLine = current ? "\n" : "";
+  box.value = `${current}${newLine}${set.label} - RM${set.price}`;
+}
+
+
+
+// --- Total Up (only show Grand Total) ---
+function totalUp() {
+  const box = document.getElementById("waMessage");
+  const text = box.value;
+
+  const prices = { A: 190, B: 220, C: 280, D: 350 };
+  const matches = text.match(/Set ([A-D])/g) || [];
+
+  let grandTotal = 0;
+  matches.forEach(m => {
+    const set = m.split(" ")[1];
+    if (prices[set]) grandTotal += prices[set];
+  });
+
+  if (grandTotal > 0) {
+    addPreset(`Grand Total: RM ${grandTotal}`);
+  } else {
+    alert("No sets selected yet.");
+  }
+}
+
+
+
+function undoMsg() {
+  if (history.length === 0) return;
+  const box = document.getElementById("waMessage");
+  redoStack.push(box.value);
+  box.value = history.pop() || "";
+}
+
+function redoMsg() {
+  if (redoStack.length === 0) return;
+  const box = document.getElementById("waMessage");
+  history.push(box.value);
+  box.value = redoStack.pop();
+}
+
+/* === Name Formatting === */
+function capitalizeName(name) {
+  name = name.trim();
+  if (!name) return "";
+  return name
+    .split(/\s+/) // split by spaces
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+}
+
+
+/* === Country Flag & Name Display === */
+document.addEventListener("DOMContentLoaded", () => {
+  const numberInput = document.getElementById("waNumber");
+  numberInput.addEventListener("input", updateCountryDisplay);
+});
+
+/* === Country Flag & Name Display === */
+function detectCountry(num) {
+  const countries = [
+    // --- SE Asia ---
+{ code: "60", name: "Malaysia" },
+{ code: "65", name: "Singapore" },
+{ code: "62", name: "Indonesia" },
+{ code: "63", name: "Philippines" },
+{ code: "66", name: "Thailand" },
+{ code: "84", name: "Vietnam" },
+{ code: "673", name: "Brunei" },
+{ code: "95", name: "Myanmar" },
+{ code: "856", name: "Laos" },
+
+// --- East Asia ---
+{ code: "81", name: "Japan" },
+{ code: "82", name: "South Korea" },
+{ code: "86", name: "China" },
+{ code: "852", name: "Hong Kong" },
+{ code: "853", name: "Macau" },
+{ code: "886", name: "Taiwan" },
+
+// --- South Asia ---
+{ code: "91", name: "India" },
+{ code: "92", name: "Pakistan" },
+{ code: "94", name: "Sri Lanka" },
+{ code: "880", name: "Bangladesh" },
+{ code: "977", name: "Nepal" },
+
+// --- Oceania ---
+{ code: "61", name: "Australia" },
+{ code: "64", name: "New Zealand" },
+{ code: "687", name: "New Caledonia" },
+
+// --- Middle East ---
+{ code: "971", name: "UAE" },
+{ code: "966", name: "Saudi Arabia" },
+{ code: "965", name: "Kuwait" },
+{ code: "968", name: "Oman" },
+{ code: "973", name: "Bahrain" },
+{ code: "974", name: "Qatar" },
+{ code: "962", name: "Jordan" },
+
+// --- Africa ---
+{ code: "27", name: "South Africa" },
+{ code: "234", name: "Nigeria" },
+{ code: "254", name: "Kenya" },
+{ code: "255", name: "Tanzania" },
+{ code: "256", name: "Uganda" },
+{ code: "263", name: "Zimbabwe" },
+{ code: "20", name: "Egypt" },
+
+// --- Europe ---
+{ code: "44", name: "United Kingdom" },
+{ code: "33", name: "France" },
+{ code: "49", name: "Germany" },
+{ code: "34", name: "Spain" },
+{ code: "39", name: "Italy" },
+{ code: "31", name: "Netherlands" },
+{ code: "32", name: "Belgium" },
+{ code: "36", name: "Hungary" },
+{ code: "43", name: "Austria" },
+{ code: "41", name: "Switzerland" },
+{ code: "46", name: "Sweden" },
+{ code: "47", name: "Norway" },
+{ code: "45", name: "Denmark" },
+{ code: "351", name: "Portugal" },
+{ code: "420", name: "Czech Republic" },
+{ code: "421", name: "Slovakia" },
+{ code: "48", name: "Poland" },
+{ code: "358", name: "Finland" },
+{ code: "40", name: "Romania" },
+{ code: "30", name: "Greece" },
+{ code: "385", name: "Croatia" },
+{ code: "386", name: "Slovenia" },
+{ code: "372", name: "Estonia" },
+{ code: "371", name: "Latvia" },
+{ code: "370", name: "Lithuania" },
+{ code: "353", name: "Ireland" },
+
+// --- Americas ---
+{ code: "1", name: "United States / Canada" },
+{ code: "55", name: "Brazil" },
+{ code: "54", name: "Argentina" },
+{ code: "57", name: "Colombia" },
+{ code: "51", name: "Peru" },
+{ code: "56", name: "Chile" },
+{ code: "58", name: "Venezuela" }
+
+  ];
+
+  num = num.trim().replace(/[^\d+]/g, "");
+  if (num.startsWith("+")) num = num.slice(1);
+
+
+  let match = countries.find(c => num.startsWith(c.code));
+  if (!num) return { flag: "🌍", name: "Enter number" };
+  return match || { flag: "🌍", name: "Unknown Country" };
+}
+
+function updateCountryDisplay() {
+  const num = document.getElementById("waNumber").value;
+  const info = detectCountry(num);
+  const display = document.getElementById("countryDisplay");
+  display.textContent = info.name; 
+}
+
+function formatPhone(num) {
+  num = num.trim();
+
+  // If starts with +, remove it BEFORE stripping non-digits
+  if (num.startsWith("+")) num = num.slice(1);
+
+  // Remove everything except digits
+  num = num.replace(/[^\d]/g, "");
+
+  // If user types 0xxxx... → treat as Malaysia
+  if (num.startsWith("0")) {
+    return "6" + num;  // 017 → 6017
+  }
+
+  // If starts with 60 → already Malaysia
+  if (num.startsWith("60")) {
+    return num;
+  }
+
+  // Otherwise foreign number → leave as is
+  return num;
+}
+
+
+
+
+/* === WhatsApp Link Builder === */
+function openWhatsApp() {
+  let name = document.getElementById("waName").value.trim();
+  let num = document.getElementById("waNumber").value.trim();
+  const msg = document.getElementById("waMessage").value.trim();
+
+  if (!num) return alert("Please enter a phone number");
+
+  name = capitalizeName(name);
+  document.getElementById("waName").value = name;
+
+  num = formatPhone(num);
+  document.getElementById("waNumber").value = num;
+
+  const url = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank");
+}
+
+</script>
+</div>
+</div>
+</div>
+
+
+
+<div style="height:100px"></div>
+
+
+
+
+
+
+
+
+
+
+<div id="targetSection">
+<div style="height:50px"></div>
+
+
+
+
 <div class="section">
 <div class="section3">
 
-<h2 style="margin-left:1%"> Check some boxes then you'll find your lens! </h2>
+<h1> Search Lenses Segment </h1>
 
     <!-- Q1: Clear or Colour -->
     <div class="section" id="q1">
@@ -328,8 +962,6 @@ input[type="checkbox"]:focus{outline:2px solid #0b3d2e33;outline-offset:2px}
 
     <div class="results" id="results">
       <div id="cardsGrid"></div>
-<span style="margin-left:1%"><b>Results shown here after clicking 'Show Results'<b></span>
-
     </div>
 
 
@@ -1397,7 +2029,7 @@ buildCards = function(list){
 
 
 
-</DIV>
+
 
 
 
@@ -1410,3 +2042,10 @@ buildCards = function(list){
 
 
 </html>
+
+
+
+
+
+
+
