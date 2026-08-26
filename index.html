@@ -49,6 +49,7 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  user-select:none;
 }
 
 /* Subtle grid pattern background */
@@ -2715,6 +2716,12 @@ function toggleSpan(id){ const el=document.getElementById(id); if(!el) return; e
   border-radius: var(--radius);
 }
 
+.floating-calculator,
+.calculator-header {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .floating-calculator.minimized .calculator-body {
   display: none;
 }
@@ -2974,6 +2981,7 @@ function calculatorPercent() {
 }
 
 
+
 /* =========================
    SIZE TOGGLE
 ========================= */
@@ -3031,16 +3039,21 @@ calculatorHeader.addEventListener("pointerdown", function(e) {
   if (e.target.closest(".calculator-controls"))
     return;
 
-  isDragging = true;
-
-  const rect =
-    calculator.getBoundingClientRect();
+  const rect = calculator.getBoundingClientRect();
 
   dragOffsetX = e.clientX - rect.left;
   dragOffsetY = e.clientY - rect.top;
 
+  /* Lock current position before dragging */
+  calculator.style.left = rect.left + "px";
+  calculator.style.top = rect.top + "px";
   calculator.style.right = "auto";
   calculator.style.bottom = "auto";
+
+  isDragging = true;
+
+  document.body.style.userSelect = "none";
+  document.body.style.webkitUserSelect = "none";
 
   calculatorHeader.setPointerCapture(e.pointerId);
 
