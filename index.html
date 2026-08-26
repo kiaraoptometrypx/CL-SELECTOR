@@ -3026,56 +3026,53 @@ let isDragging = false;
 let dragOffsetX = 0;
 let dragOffsetY = 0;
 
+calculatorHeader.addEventListener("pointerdown", function(e) {
 
-calculatorHeader.addEventListener(
-  "mousedown",
-  function(e) {
+  if (e.target.closest(".calculator-controls"))
+    return;
 
-    if (
-      e.target.closest(".calculator-controls")
-    )
-      return;
+  isDragging = true;
 
-    isDragging = true;
+  const rect =
+    calculator.getBoundingClientRect();
 
-    const rect =
-      calculator.getBoundingClientRect();
+  dragOffsetX = e.clientX - rect.left;
+  dragOffsetY = e.clientY - rect.top;
 
-    dragOffsetX =
-      e.clientX - rect.left;
+  calculator.style.right = "auto";
+  calculator.style.bottom = "auto";
 
-    dragOffsetY =
-      e.clientY - rect.top;
+  calculatorHeader.setPointerCapture(e.pointerId);
 
-    calculator.style.right = "auto";
-    calculator.style.bottom = "auto";
-  }
-);
+  e.preventDefault();
+});
 
 
-document.addEventListener(
-  "mousemove",
-  function(e) {
+calculatorHeader.addEventListener("pointermove", function(e) {
 
-    if (!isDragging)
-      return;
+  if (!isDragging)
+    return;
 
-    calculator.style.left =
-      (e.clientX - dragOffsetX) + "px";
+  calculator.style.left =
+    (e.clientX - dragOffsetX) + "px";
 
-    calculator.style.top =
-      (e.clientY - dragOffsetY) + "px";
-  }
-);
+  calculator.style.top =
+    (e.clientY - dragOffsetY) + "px";
+});
 
 
-document.addEventListener(
-  "mouseup",
-  function() {
+calculatorHeader.addEventListener("pointerup", function(e) {
 
-    isDragging = false;
-  }
-);
+  isDragging = false;
+
+  calculatorHeader.releasePointerCapture(e.pointerId);
+});
+
+
+calculatorHeader.addEventListener("pointercancel", function() {
+
+  isDragging = false;
+});
 
 
 /* =========================
