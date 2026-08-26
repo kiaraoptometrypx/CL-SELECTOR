@@ -276,8 +276,7 @@ textarea {
 ============================================================ */
 button {
   font-family: var(--font-body);
-  font-size: 10px;
-  font-weight: 500;
+  font-size: 12px;
   background: var(--accent);
   color: #fff;
   border: none;
@@ -2482,7 +2481,7 @@ function toggleSpan(id){ const el=document.getElementById(id); if(!el) return; e
     <span>Calculator</span>
 
     <div class="calculator-controls">
-      <button type="button" id="resizeCalc" title="Change size">□</button>
+      <button style="margin-bottom:15px" type="button" id="resizeCalc" title="Change size">□</button>
       <button type="button" id="minimizeCalc" title="Minimize">−</button>
     </div>
   </div>
@@ -2533,7 +2532,8 @@ function toggleSpan(id){ const el=document.getElementById(id); if(!el) return; e
 
 .floating-calculator {
   position: fixed;
-  right: 25px; bottom: 25px;
+right: 25px;
+top: 25px;
   width: 300px;
   background: var(--surface);
   border: 1px solid var(--border-strong);
@@ -2561,8 +2561,6 @@ function toggleSpan(id){ const el=document.getElementById(id); if(!el) return; e
   justify-content: space-between;
   background: var(--accent);
   color: #fff;
-  font-size: 16px;
-  font-weight: 600;
   cursor: move;
 }
 
