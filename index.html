@@ -2631,13 +2631,8 @@ function toggleSpan(id){ const el=document.getElementById(id); if(!el) return; e
   transition: 0.15s;
 }
 
-.calculator-buttons button:hover {
-  background: var(--accent-lt);
-}
 
-.calculator-buttons button:active {
-  transform: scale(0.95);
-}
+
 
 
 /* OPERATORS */
@@ -3005,7 +3000,7 @@ document
     this.textContent =
       calculator.classList.contains("small")
         ? "□"
-        : "▪";
+        : "□";
   });
 
 
