@@ -2546,6 +2546,10 @@ function toggleSpan(id){ const el=document.getElementById(id); if(!el) return; e
   user-select: none;
 }
 
+#resizeCalc:hover,
+#minimizeCalc:hover {
+  background: transparent !important;
+}
 
 /* HEADER */
 
@@ -2575,10 +2579,6 @@ function toggleSpan(id){ const el=document.getElementById(id); if(!el) return; e
   color: #fff;
   font-size: 19px;
   cursor: pointer;
-}
-
-.calculator-controls button:hover {
-  background: rgba(255,255,255,0.15);
 }
 
 
