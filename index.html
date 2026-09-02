@@ -1700,112 +1700,172 @@ function renderCards(data){
 
 
 function buildCards(list){
-  const grid=document.getElementById("cardsGrid");
+  const grid = document.getElementById("cardsGrid");
   if(!grid) return;
-  const H_DISPOSE="MODALITY (1 day, 2 weeks, 1 month, 3 months)";
-  const H_PRICE="1 BOX PRICE & UNIT";
-  const H_PRICE_UNIT="PRICE 1 BOX (RM)";
-  const H_2_BOX="2 BOX";
-  const H_4_BOX="4 BOX";
-  const H_8_BOX="8 BOX";
-  const H_VALUE="VALUE_PER_PAIR";
-  const H_PROMO="PROMO";
-  const H_COMFORT="COMFORT";
-  const H_MAT="MATERIAL";
-  const H_HOURS="WEARING_HOURS";
-  const H_SUPPLY="SUPPLY";
+
+  const H_DISPOSE = "MODALITY (1 day, 2 weeks, 1 month, 3 months)";
+  const H_PRICE = "1 BOX PRICE & UNIT";
+  const H_PRICE_UNIT = "PRICE 1 BOX (RM)";
+  const H_PK1 = "PK1";
+  const H_PK2 = "PK2";
+  const H_PK3 = "PK3";
+  const H_PK4 = "PK4";
+  const H_2_BOX = "2 BOX";
+  const H_4_BOX = "4 BOX";
+  const H_8_BOX = "8 BOX";
+  const H_VALUE = "VALUE_PER_PAIR";
+  const H_PROMO = "PROMO";
+  const H_COMFORT = "COMFORT";
+  const H_MAT = "MATERIAL";
+  const H_HOURS = "WEARING_HOURS";
+  const H_SUPPLY = "SUPPLY";
 
 
-  const html=list.map((p,idx)=>{
-    const id="card_"+idx;
-    const name=p["FULL NAME"]||"";
-    const promo=(p[H_PROMO]||"").trim();
-    const hasPromo=promo.length>0;
-    const photoKey=(p["PHOTO"]||"").trim();
-    const hasPhoto=!!photoKey;
-    const photoURL=hasPhoto?`https://sp-rx.github.io/CL-SELECTOR/CL-PHOTOS/${photoKey}.png`:"";
-    const price=p[H_PRICE]||"";
-    const price_unit=p[H_PRICE_UNIT]||"";
-    const supply=p[H_SUPPLY]||"";
-    const mat=p[H_MAT]||"";
-    const box2=p[H_2_BOX]||"";
-    const box4=p[H_4_BOX]||"";
-    const box8=p[H_8_BOX]||"";
-    const value=p[H_VALUE]||"";
-    const hoursRaw=p[H_HOURS]||"";
-    const hours=hoursRaw?`${parseFloat(hoursRaw)} hrs`:"";
-    const isLoose=/\bloose\b/i.test(name);
-    const leadDays=parseInt(p["LEAD_TIME"]||"3",10);
-    const etaText=computeETA(leadDays,{looseStart:isLoose}).text;
+  const html = list.map((p, idx) => {
+    const id = "card_" + idx;
+
+    const name = p["FULL NAME"] || "";
+    const promo = (p[H_PROMO] || "").trim();
+    const hasPromo = promo.length > 0;
+
+    const photoKey = (p["PHOTO"] || "").trim();
+    const hasPhoto = !!photoKey;
+
+    const photoURL = hasPhoto
+      ? `https://sp-rx.github.io/CL-SELECTOR/CL-PHOTOS/${photoKey}.png`
+      : "";
+
+    const price = p[H_PRICE] || "";
+
+    // Convert CSV values into numbers
+    const price_unit = parseFloat(p[H_PRICE_UNIT]) || 0;
+    const supply = parseFloat(p[H_SUPPLY]) || 0;
+
+    // PK quantities come DIRECTLY from CSV
+    const pk1 = parseFloat(p[H_PK1]) || 0;
+    const pk2 = parseFloat(p[H_PK2]) || 0;
+    const pk3 = parseFloat(p[H_PK3]) || 0;
+    const pk4 = parseFloat(p[H_PK4]) || 0;
+
+    // Discount values from CSV
+    const box2 = parseFloat(p[H_2_BOX]) || 0;
+    const box4 = parseFloat(p[H_4_BOX]) || 0;
+    const box8 = parseFloat(p[H_8_BOX]) || 0;
+
+    const value = p[H_VALUE] || "";
+    const mat = p[H_MAT] || "";
+
+    const hoursRaw = p[H_HOURS] || "";
+    const hours = hoursRaw ? `${parseFloat(hoursRaw)} hrs` : "";
+
+    const isLoose = /\bloose\b/i.test(name);
+
+    const leadDays = parseInt(p["LEAD_TIME"] || "3", 10);
+    const etaText = computeETA(leadDays, {
+      looseStart: isLoose
+    }).text;
+
 
     return `
       <div id="${id}" class="pane lens-card card-compact" style="position:relative;">
-        <div style="font-weight:600; font-size:10px; color:var(--text); margin-bottom:8px;">${name} (${mat})</div>
-        <div class="photo" style="margin-bottom:0px;">
-          ${hasPhoto
-            ? `<img src="${photoURL}" alt="${name}" onerror="this.style.display='none'">`
-            : `<div style="width:100%;height:auto;display:flex;align-items:center;justify-content:center;color:var(--text-faint);border:1px dashed var(--border-strong);border-radius:var(--radius);font-size:12px;">No photo</div>`
-          }
-         
+
+        <div style="font-weight:600; font-size:10px; color:var(--text); margin-bottom:8px;">
+          ${name} (${mat})
         </div>
 
-<div id="details-${id}" style="display:none; font-size:10px; line-height:1.7; color:var(--text-mid);">
-<div style="height:65px"> ${hasPromo?`<div class="promo-badge">🔥 ${promo}</div>`:""}</div>
+        <div class="photo" style="margin-bottom:0px;">
+          ${
+            hasPhoto
+              ? `<img src="${photoURL}" alt="${name}" onerror="this.style.display='none'">`
+              : `<div style="width:100%;height:auto;display:flex;align-items:center;justify-content:center;color:var(--text-faint);border:1px dashed var(--border-strong);border-radius:var(--radius);font-size:12px;">No photo</div>`
+          }
+        </div>
 
-          <div><span style="font-weight:600;">1 PK (pack) has ${price} ${mat} lenses.</span></div>
 
-<div>
-  <span style="font-weight:600;">
-    --- <br> 1 PK = ${supply * 1} days or ${Math.round((supply * 1 / 30) * 10) / 10} months
-  </span>
+        <div id="details-${id}" style="display:none; font-size:10px; line-height:1.7; color:var(--text-mid);">
 
-  <span style="font-weight:600;">
-   = RM ${price_unit} , -
-  </span>
-</div>
+          <div style="height:65px">
+            ${
+              hasPromo
+                ? `<div class="promo-badge">🔥 ${promo}</div>`
+                : ""
+            }
+          </div>
 
-<div>
-  <span style="font-weight:600;">
-    2 PK = ${supply * 2} days or ${Math.round((supply * 2 / 30) * 10) / 10} months
-  </span>
 
-  <span style="font-weight:600;">
-    = RM ${((price_unit * 2) - box2)}
-  </span>
+          <div>
+            <span style="font-weight:600;">
+              1 PK (pack) has ${price} ${mat} lenses.
+            </span>
+          </div>
 
-  <span style="font-weight:600;color:#3A6656;">
-    , RM ${Math.round(price_unit - (box2 / 2))} / PK
-  </span>
-</div>
 
-<div>
-  <span style="font-weight:600;">
-    4 PK = ${supply * 4} days or ${Math.round((supply * 4 / 30) * 10) / 10} months
-  </span>
+          <!-- PK1 -->
+          <div>
+            <span style="font-weight:600;">
+              ${pk1} PK = ${supply * pk1} days or
+              ${Math.round((supply * pk1 / 30) * 10) / 10} months
+            </span>
 
-  <span style="font-weight:600;">
-   = RM ${((price_unit * 4) - box4)}
-  </span>
+            <span style="font-weight:600;">
+              = RM ${Math.round(price_unit * pk1)}
+            </span>
 
-  <span style="font-weight:600;color:#3A6656;">
-    , RM ${Math.round(price_unit - (box4 / 4))} / PK
-  </span>
-</div>
+            <span style="font-weight:600;color:#3A6656;">
+              , RM ${Math.round(price_unit)} / PK
+            </span>
+          </div>
 
-<div>
-  <span style="font-weight:600;">
-    8 PK = ${supply * 8} days or ${Math.round((supply * 8 / 30) * 10) / 10} months
-  </span>
 
-  <span style="font-weight:600;">
-    = RM ${((price_unit * 8) - box8)}
-  </span>
+          <!-- PK2 -->
+          <div>
+            <span style="font-weight:600;">
+              ${pk2} PK = ${supply * pk2} days or
+              ${Math.round((supply * pk2 / 30) * 10) / 10} months
+            </span>
 
-  <span style="font-weight:600;color:#3A6656;">
-    , RM ${Math.round(price_unit - (box8 / 8))} / PK
-  </span>
-</div>
+            <span style="font-weight:600;">
+              = RM ${Math.round((price_unit * pk2) - box2)}
+            </span>
 
+            <span style="font-weight:600;color:#3A6656;">
+              , RM ${Math.round(price_unit - (box2 / pk2))} / PK
+            </span>
+          </div>
+
+
+          <!-- PK3 -->
+          <div>
+            <span style="font-weight:600;">
+              ${pk3} PK = ${supply * pk3} days or
+              ${Math.round((supply * pk3 / 30) * 10) / 10} months
+            </span>
+
+            <span style="font-weight:600;">
+              = RM ${Math.round((price_unit * pk3) - box4)}
+            </span>
+
+            <span style="font-weight:600;color:#3A6656;">
+              , RM ${Math.round(price_unit - (box4 / pk3))} / PK
+            </span>
+          </div>
+
+
+          <!-- PK4 -->
+          <div>
+            <span style="font-weight:600;">
+              ${pk4} PK = ${supply * pk4} days or
+              ${Math.round((supply * pk4 / 30) * 10) / 10} months
+            </span>
+
+            <span style="font-weight:600;">
+              = RM ${Math.round((price_unit * pk4) - box8)}
+            </span>
+
+            <span style="font-weight:600;color:#3A6656;">
+              , RM ${Math.round(price_unit - (box8 / pk4))} / PK
+            </span>
+          </div>
 
           <div style="display:none"><span style="font-weight:600;">Value/Piece:</span> ${value||"—"}</div>---<br>
           <div><span style="font-weight:600;">Comfy Hours:</span> ${hours||"—"}</div>
@@ -1817,110 +1877,151 @@ function buildCards(list){
   grid.innerHTML=html;
   bindDefToggles(grid);
 
-  list.forEach((p,idx)=>{
-    const id="card_"+idx;
-    const el=document.getElementById(id);
-    if(!el) return;
-    el.addEventListener('click',()=>{
-      const name=p["FULL NAME"]||"";
-      const photoKey=(p["PHOTO"]||"").trim();
-      const hasPhoto=!!photoKey;
-      const photoURL=hasPhoto?`https://sp-rx.github.io/CL-SELECTOR/CL-PHOTOS/${photoKey}.png`:"";
-      const dispose=p[H_DISPOSE]||"";
-      const price=p[H_PRICE]||"";
-    const price_unit=p[H_PRICE_UNIT]||"";
-    const box2=p[H_2_BOX]||"";
-    const box4=p[H_4_BOX]||"";
-    const box8=p[H_8_BOX]||"";
-      const value=p[H_VALUE]||"";
-      const supply=p[H_SUPPLY]||"";
+list.forEach((p,idx)=>{
+  const id="card_"+idx;
+  const el=document.getElementById(id);
+  if(!el) return;
+
+  el.addEventListener('click',()=>{
+    const name=p["FULL NAME"]||"";
+
+    const photoKey=(p["PHOTO"]||"").trim();
+    const hasPhoto=!!photoKey;
+    const photoURL=hasPhoto
+      ? `https://sp-rx.github.io/CL-SELECTOR/CL-PHOTOS/${photoKey}.png`
+      : "";
+
+    const dispose=p[H_DISPOSE]||"";
+    const price=p[H_PRICE]||"";
+
+    const price_unit=parseFloat(p[H_PRICE_UNIT])||0;
+
+    // PK quantities — fetched directly from CSV
+    const pk1=parseFloat(p["PK1"])||0;
+    const pk2=parseFloat(p["PK2"])||0;
+    const pk3=parseFloat(p["PK3"])||0;
+    const pk4=parseFloat(p["PK4"])||0;
+
+    // Discounts / box deductions
+    const box2=parseFloat(p[H_2_BOX])||0;
+    const box4=parseFloat(p[H_4_BOX])||0;
+    const box8=parseFloat(p[H_8_BOX])||0;
+
+    const value=p[H_VALUE]||"";
+    const supply=parseFloat(p[H_SUPPLY])||0;
+
+    const comfort=p[H_COMFORT]||"";
+    const material=p[H_MAT]||"";
+
+    const promo=(p[H_PROMO]||"").trim();
+    const hasPromo=promo.length>0;
+
+    const hoursRaw=p[H_HOURS]||"";
+    const hours=hoursRaw?`${parseFloat(hoursRaw)} hrs`:"";
+
+    const comfortNice=niceCase(comfort);
+    const materialNice=mapMaterial(material);
+
+    const isLoose=/\bloose\b/i.test(name);
+
+    const leadDays=parseInt(p["LEAD_TIME"]||"3",10);
+    const etaText=computeETA(leadDays,{looseStart:isLoose}).text;
 
 
+    const expandedHTML=`
+      <div class="zoom-card-flex">
 
-      const comfort=p[H_COMFORT]||"";
-      const material=p[H_MAT]||"";
-      const promo=(p[H_PROMO]||"").trim();
-      const hasPromo=promo.length>0;
-      const hoursRaw=p[H_HOURS]||"";
-      const hours=hoursRaw?`${parseFloat(hoursRaw)} hrs`:"";
-      const comfortNice=niceCase(comfort);
-      const materialNice=mapMaterial(material);
-      const isLoose=/\bloose\b/i.test(name);
-      const leadDays=parseInt(p["LEAD_TIME"]||"3",10);
-      const etaText=computeETA(leadDays,{looseStart:isLoose}).text;
+        <div class="photo" style="text-align:center;">
+          ${hasPhoto
+            ? `<img src="${photoURL}" alt="${name}">`
+            : `<div style="width:100%;height:200px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);border:1px dashed var(--border-strong);border-radius:var(--radius);">No photo</div>`
+          }
+        </div>
 
-      const expandedHTML=`
-        <div class="zoom-card-flex">
-          <div class="photo" style="text-align:center;">
-            ${hasPhoto
-              ? `<img src="${photoURL}" alt="${name}">`
-              : `<div style="width:100%;height:200px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);border:1px dashed var(--border-strong);border-radius:var(--radius);">No photo</div>`
-            }
+        <div class="details">
+
+          <div style="font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--text); margin-bottom:6px;">
+            ${name}
           </div>
-          <div class="details">
+
+          <div>
+            <b>Current Promo:</b>
+            <span style="color:${hasPromo?'var(--danger)':'var(--text-muted)'}">
+              ${hasPromo?promo:"Not at the moment"}
+            </span>
+          </div>
+
+          <div>
+            <b>1 PK (pack) has </b> ${price}
+          </div>
 
 
+          <!-- PK1 -->
+          <div>
+            <span style="font-weight:600;">
+              ${pk1} PK = ${supply * pk1} days or
+              ${Math.round((supply * pk1 / 30) * 10) / 10} months
+            </span>
+
+            <span style="font-weight:600;">
+              = RM ${Math.round(price_unit * pk1)}
+            </span>
+
+            <span style="font-weight:600;color:#3A6656;">
+              , RM ${Math.round(price_unit)} / PK
+            </span>
+          </div>
 
 
+          <!-- PK2 -->
+          <div>
+            <span style="font-weight:600;">
+              ${pk2} PK = ${supply * pk2} days or
+              ${Math.round((supply * pk2 / 30) * 10) / 10} months
+            </span>
 
-            <div style="font-family:var(--font-display); font-size:18px; font-weight:600; color:var(--text); margin-bottom:6px;">${name}</div>
-            <div><b>Current Promo:</b> <span style="color:${hasPromo?'var(--danger)':'var(--text-muted)'}">${hasPromo?promo:"Not at the moment"}</span></div>
+            <span style="font-weight:600;">
+              = RM ${Math.round((price_unit * pk2) - box2)}
+            </span>
+
+            <span style="font-weight:600;color:#3A6656;">
+              , RM ${Math.round(price_unit - (box2 / pk2))} / PK
+            </span>
+          </div>
 
 
+          <!-- PK3 -->
+          <div>
+            <span style="font-weight:600;">
+              ${pk3} PK = ${supply * pk3} days or
+              ${Math.round((supply * pk3 / 30) * 10) / 10} months
+            </span>
 
-            <div><b>1 PK (pack) has </b> ${price}</div>
+            <span style="font-weight:600;">
+              = RM ${Math.round((price_unit * pk3) - box4)}
+            </span>
 
-<div>
-  <span style="font-weight:600;">
-    --- <br> 1 PK = ${supply * 1} days or ${Math.round((supply * 1 / 30) * 10) / 10} months
-  </span>
+            <span style="font-weight:600;color:#3A6656;">
+              , RM ${Math.round(price_unit - (box4 / pk3))} / PK
+            </span>
+          </div>
 
-  <span style="font-weight:600;">
-   = RM ${price_unit} , -
-  </span>
-</div>
 
-<div>
-  <span style="font-weight:600;">
-    2 PK = ${supply * 2} days or ${Math.round((supply * 2 / 30) * 10) / 10} months
-  </span>
+          <!-- PK4 -->
+          <div>
+            <span style="font-weight:600;">
+              ${pk4} PK = ${supply * pk4} days or
+              ${Math.round((supply * pk4 / 30) * 10) / 10} months
+            </span>
 
-  <span style="font-weight:600;">
-    = RM ${((price_unit * 2) - box2)}
-  </span>
+            <span style="font-weight:600;">
+              = RM ${Math.round((price_unit * pk4) - box8)}
+            </span>
 
-  <span style="font-weight:600;color:#3A6656;">
-    , RM ${Math.round(price_unit - (box2 / 2))} / PK
-  </span>
-</div>
-
-<div>
-  <span style="font-weight:600;">
-    4 PK = ${supply * 4} days or ${Math.round((supply * 4 / 30) * 10) / 10} months
-  </span>
-
-  <span style="font-weight:600;">
-   = RM ${((price_unit * 4) - box4)}
-  </span>
-
-  <span style="font-weight:600;color:#3A6656;">
-    , RM ${Math.round(price_unit - (box4 / 4))} / PK
-  </span>
-</div>
-
-<div>
-  <span style="font-weight:600;">
-    8 PK = ${supply * 8} days or ${Math.round((supply * 8 / 30) * 10) / 10} months
-  </span>
-
-  <span style="font-weight:600;">
-    = RM ${((price_unit * 8) - box8)}
-  </span>
-
-  <span style="font-weight:600;color:#3A6656;">
-    , RM ${Math.round(price_unit - (box8 / 8))} / PK
-  </span>
-</div>
+            <span style="font-weight:600;color:#3A6656;">
+              , RM ${Math.round(price_unit - (box8 / pk4))} / PK
+            </span>
+          </div>
 
 
             <div><b>Estimated Ready:</b> ${etaText}<br><em style="font-size:11px;color:var(--text-faint);">* May take more than a month if no stock</em></div>
@@ -2160,116 +2261,159 @@ function toggleCompare(cardEl,product,btn){
 
 
 function getExpandedCardHTML(p){
-  const H_DISPOSE="MODALITY (1 day, 2 weeks, 1 month, 3 months)";
-  const H_PRICE="1 BOX PRICE & UNIT";
-  const H_VALUE="VALUE_PER_PAIR";
-  const H_PROMO="PROMO";
-  const H_COMFORT="COMFORT";
-  const H_MAT="MATERIAL";
-  const H_HOURS="WEARING_HOURS";
-const H_PRICE_UNIT = "PRICE 1 BOX (RM)";
-const H_2_BOX = "2 BOX";
-const H_4_BOX = "4 BOX";
-const H_8_BOX = "8 BOX";
-  const H_SUPPLY="SUPPLY";
+  const H_DISPOSE = "MODALITY (1 day, 2 weeks, 1 month, 3 months)";
+  const H_PRICE = "1 BOX PRICE & UNIT";
+  const H_VALUE = "VALUE_PER_PAIR";
+  const H_PROMO = "PROMO";
+  const H_COMFORT = "COMFORT";
+  const H_MAT = "MATERIAL";
+  const H_HOURS = "WEARING_HOURS";
+  const H_PRICE_UNIT = "PRICE 1 BOX (RM)";
+  const H_2_BOX = "2 BOX";
+  const H_4_BOX = "4 BOX";
+  const H_8_BOX = "8 BOX";
+  const H_SUPPLY = "SUPPLY";
+
+  const H_PK1 = "PK1";
+  const H_PK2 = "PK2";
+  const H_PK3 = "PK3";
+  const H_PK4 = "PK4";
 
 
-  const name=p["FULL NAME"]||"";
-  const photoKey=(p["PHOTO"]||"").trim();
-  const hasPhoto=!!photoKey;
-  const photoURL=hasPhoto
+  const name = p["FULL NAME"] || "";
+
+  const photoKey = (p["PHOTO"] || "").trim();
+  const hasPhoto = !!photoKey;
+
+  const photoURL = hasPhoto
     ? `https://sp-rx.github.io/CL-SELECTOR/CL-PHOTOS/${photoKey}.png`
     : "";
 
-  const dispose=p[H_DISPOSE]||"";
-  const price=p[H_PRICE]||"";
-    const price_unit=p[H_PRICE_UNIT]||"";
-    const box2=p[H_2_BOX]||"";
-    const box4=p[H_4_BOX]||"";
-    const box8=p[H_8_BOX]||"";
-  const value=p[H_VALUE]||"";
-  const comfort=p[H_COMFORT]||"";
-  const supply=p[H_SUPPLY]||"";
-  const material=p[H_MAT]||"";
-  const promo=(p[H_PROMO]||"").trim();
-  const hasPromo=promo.length>0;
-  const hoursRaw=p[H_HOURS]||"";
-  const hours=hoursRaw?`${parseFloat(hoursRaw)} hrs`:"";
 
-  const comfortNice=niceCase(comfort);
-  const materialNice=mapMaterial(material);
+  const dispose = p[H_DISPOSE] || "";
+  const price = p[H_PRICE] || "";
 
-  const isLoose=/\bloose\b/i.test(name);
-  const leadDays=parseInt(p["LEAD_TIME"]||"3",10);
-  const etaText=computeETA(leadDays,{looseStart:isLoose}).text;
+  const price_unit = parseFloat(p[H_PRICE_UNIT]) || 0;
+
+  // PK quantities come directly from CSV
+  const pk1 = parseFloat(p[H_PK1]) || 0;
+  const pk2 = parseFloat(p[H_PK2]) || 0;
+  const pk3 = parseFloat(p[H_PK3]) || 0;
+  const pk4 = parseFloat(p[H_PK4]) || 0;
+
+  // Discount values
+  const box2 = parseFloat(p[H_2_BOX]) || 0;
+  const box4 = parseFloat(p[H_4_BOX]) || 0;
+  const box8 = parseFloat(p[H_8_BOX]) || 0;
+
+  const value = p[H_VALUE] || "";
+  const comfort = p[H_COMFORT] || "";
+  const supply = parseFloat(p[H_SUPPLY]) || 0;
+  const material = p[H_MAT] || "";
+
+  const promo = (p[H_PROMO] || "").trim();
+  const hasPromo = promo.length > 0;
+
+  const hoursRaw = p[H_HOURS] || "";
+  const hours = hoursRaw ? `${parseFloat(hoursRaw)} hrs` : "";
+
+  const comfortNice = niceCase(comfort);
+  const materialNice = mapMaterial(material);
+
+  const isLoose = /\bloose\b/i.test(name);
+
+  const leadDays = parseInt(p["LEAD_TIME"] || "3", 10);
+  const etaText = computeETA(leadDays, {
+    looseStart: isLoose
+  }).text;
+
 
   return `
     <div class="zoom-card-flex">
+
       <div class="photo" style="text-align:center;">
         ${
           hasPhoto
-          ? `<img src="${photoURL}" alt="${name}">`
-          : `<div style="height:100px;display:flex;align-items:center;justify-content:center;border:1px dashed #ccc;">No photo</div>`
+            ? `<img src="${photoURL}" alt="${name}">`
+            : `<div style="height:100px;display:flex;align-items:center;justify-content:center;border:1px dashed #ccc;">No photo</div>`
         }
       </div>
 
+
       <div class="details">
+
         <div style="font-size:12px;font-weight:600;margin-bottom:8px;">
           ${name}
         </div>
-        <div>1 PK (pack) has ${price}</div>
 
-<div>
-  <span style="font-weight:600;">
-    --- <br> 1 PK = ${supply * 1} days or ${Math.round((supply * 1 / 30) * 10) / 10} months
-  </span>
+        <div>
+          1 PK (pack) has ${price}
+        </div>
 
-  <span style="font-weight:600;">
-   = RM ${price_unit} , -
-  </span>
-</div>
 
-<div>
-  <span style="font-weight:600;">
-    2 PK = ${supply * 2} days or ${Math.round((supply * 2 / 30) * 10) / 10} months
-  </span>
+        <!-- PK1 -->
+        <div>
+          <span style="font-weight:600;">
+            --- <br>
+            ${pk1} PK = ${supply * pk1} days or
+            ${Math.round((supply * pk1 / 30) * 10) / 10} months
+          </span>
 
-  <span style="font-weight:600;">
-    = RM ${((price_unit * 2) - box2)}
-  </span>
+          <span style="font-weight:600;">
+            = RM ${Math.round(price_unit * pk1)} , -
+          </span>
+        </div>
 
-  <span style="font-weight:600;color:#3A6656;">
-    , RM ${Math.round(price_unit - (box2 / 2))} / PK
-  </span>
-</div>
 
-<div>
-  <span style="font-weight:600;">
-    4 PK = ${supply * 4} days or ${Math.round((supply * 4 / 30) * 10) / 10} months
-  </span>
+        <!-- PK2 -->
+        <div>
+          <span style="font-weight:600;">
+            ${pk2} PK = ${supply * pk2} days or
+            ${Math.round((supply * pk2 / 30) * 10) / 10} months
+          </span>
 
-  <span style="font-weight:600;">
-   = RM ${((price_unit * 4) - box4)}
-  </span>
+          <span style="font-weight:600;">
+            = RM ${Math.round((price_unit * pk2) - box2)}
+          </span>
 
-  <span style="font-weight:600;color:#3A6656;">
-    , RM ${Math.round(price_unit - (box4 / 4))} / PK
-  </span>
-</div>
+          <span style="font-weight:600;color:#3A6656;">
+            , RM ${Math.round(price_unit - (box2 / pk2))} / PK
+          </span>
+        </div>
 
-<div>
-  <span style="font-weight:600;">
-    8 PK = ${supply * 8} days or ${Math.round((supply * 8 / 30) * 10) / 10} months
-  </span>
 
-  <span style="font-weight:600;">
-    = RM ${((price_unit * 8) - box8)}
-  </span>
+        <!-- PK3 -->
+        <div>
+          <span style="font-weight:600;">
+            ${pk3} PK = ${supply * pk3} days or
+            ${Math.round((supply * pk3 / 30) * 10) / 10} months
+          </span>
 
-  <span style="font-weight:600;color:#3A6656;">
-    , RM ${Math.round(price_unit - (box8 / 8))} / PK
-  </span>
-</div>
+          <span style="font-weight:600;">
+            = RM ${Math.round((price_unit * pk3) - box4)}
+          </span>
+
+          <span style="font-weight:600;color:#3A6656;">
+            , RM ${Math.round(price_unit - (box4 / pk3))} / PK
+          </span>
+        </div>
+
+
+        <!-- PK4 -->
+        <div>
+          <span style="font-weight:600;">
+            ${pk4} PK = ${supply * pk4} days or
+            ${Math.round((supply * pk4 / 30) * 10) / 10} months
+          </span>
+
+          <span style="font-weight:600;">
+            = RM ${Math.round((price_unit * pk4) - box8)}
+          </span>
+
+          <span style="font-weight:600;color:#3A6656;">
+            , RM ${Math.round(price_unit - (box8 / pk4))} / PK
+          </span>
+        </div>
 
 
         <div><b>Estimated Ready:</b> ${etaText}</div>
